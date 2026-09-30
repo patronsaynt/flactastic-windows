@@ -1,0 +1,16 @@
+[package]
+name = "fl-conformance"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Sync interop harness against real Mac/iPhone peers"
+
+[dependencies]
+fl-core = { path = "../fl-core" }
+fl-sync = { path = "../fl-sync" }
+fl-platform = { path = "../fl-platform" }
+serde.workspace = true
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "time"] }
+mdns-sd = "0.13"
