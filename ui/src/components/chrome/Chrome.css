@@ -1,0 +1,162 @@
+/* FLPillToggle */
+.pill-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--divider);
+}
+
+.pill-toggle__seg {
+  position: relative;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  transition: color 0.2s ease-in-out;
+}
+
+.pill-toggle__seg.is-icon {
+  width: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.pill-toggle__seg.is-active {
+  color: var(--text-primary);
+}
+
+.pill-toggle__bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  background: var(--surface-elevated);
+}
+
+.pill-toggle__label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* FLCapsuleBackground */
+.capsule {
+  height: 34px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--divider);
+}
+
+.sort-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 11px 0 13px;
+  flex: none;
+}
+
+.sort-menu__label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.sort-menu__chevron {
+  color: var(--text-tertiary);
+}
+
+.circle-button {
+  width: 34px;
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  flex: none;
+}
+
+.circle-button:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.circle-button:disabled {
+  opacity: 0.6;
+}
+
+/* FLActionPillStyle */
+.action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--divider);
+  transition: transform 0.08s ease-out, background-color 0.08s ease-out;
+  flex: none;
+}
+
+.action-pill:active {
+  transform: scale(0.96);
+  background: var(--surface-hover);
+}
+
+.action-pill.is-primary {
+  color: var(--background);
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.action-pill.is-primary:active {
+  background: var(--text-secondary);
+}
+
+.action-pill:disabled {
+  opacity: 0.5;
+}
+
+/* FLBackLink */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+.back-link:hover {
+  color: var(--text-primary);
+}
+
+/* FLTrackListHeader */
+.track-list-header {
+  display: flex;
+  gap: 14px;
+  padding: 0 10px 10px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--divider);
+}
+
+/* The redesign's .fl-row: 9/10 padding, 10pt radius, surface on hover. */
+.fl-row {
+  padding: 9px 10px;
+  border-radius: 10px;
+}
+
+.fl-row:hover {
+  background: var(--surface);
+}
+
+.fl-row.is-filled,
+.fl-row.is-filled:hover {
+  background: var(--surface-elevated);
+}

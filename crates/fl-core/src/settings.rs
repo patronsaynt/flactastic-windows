@@ -93,8 +93,9 @@ defaults! {
     d_ui_scale: f64 = 1.0;
     d_true: bool = true;
     d_counted: f64 = 0.90;
-    d_collection_sort: String = "album".into();
-    d_all_tracks_sort: String = "dateAdded".into();
+    // @AppStorage stores the enums' raw values.
+    d_collection_sort: String = "Album".into();
+    d_all_tracks_sort: String = "Date Added".into();
     d_stats_range: String = "allTime".into();
     d_profiles: Vec<OrganizerProfile> = vec![OrganizerProfile::default_profile()];
 }

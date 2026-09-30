@@ -1,0 +1,37 @@
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 200px;
+  padding: 0 var(--space-md);
+  color: var(--text-tertiary);
+  flex: none;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.search input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.search--capsule input {
+  font-size: 12px;
+}
+
+.search--rounded {
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+}
+
+.search--rounded input {
+  font-weight: 500;
+}

@@ -1,0 +1,45 @@
+.seek {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.seek__hit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  touch-action: none;
+}
+
+.seek__track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-radius: 999px;
+  background: var(--surface-elevated);
+}
+
+.seek__fill {
+  position: absolute;
+  left: 0;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.seek__thumb {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.seek__times {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+}
+
+.seek--prominent .seek__times {
+  font-size: 12px;
+}

@@ -112,8 +112,11 @@ fn run(ext: &str, codec: &[&str]) {
         write_wav(&wav, &pcm, rate);
         let p = dir.path().join(format!("{i}.{ext}"));
         encode(&ff, &wav, &p, codec);
-        let r = reference_decode(&ff, &p, &dir.path().join(format!("{i}.ref.wav")));
-        assert_eq!(r.len(), cut - prev, "{ext}: ffmpeg's own decode of file {i} has the wrong length");
+        let mut r = reference_decode(&ff, &p, &dir.path().join(format!("{i}.ref.wav")));
+        // ffmpeg < 7 trims MP4 priming but leaves the trailing padding in its
+        // own decode; the start is still aligned, so cut the reference.
+        assert!(r.len() >= cut - prev, "{ext}: ffmpeg's own decode of file {i} is short");
+        r.truncate(cut - prev);
         reference.extend(r);
         tracks.push(Track::make_from_path(&p).unwrap());
         prev = cut;
@@ -155,7 +158,9 @@ fn mp3_lame_is_gapless() {
 
 #[test]
 fn aac_m4a_is_gapless() {
-    run("m4a", &["-c:a", "aac", "-b:a", "256k"]);
+    // A sample-accurate movie timescale: ffmpeg < 7 defaults to 1000, which
+    // rounds the edit list's length to the millisecond.
+    run("m4a", &["-c:a", "aac", "-b:a", "256k", "-movie_timescale", "44100"]);
 }
 
 #[test]

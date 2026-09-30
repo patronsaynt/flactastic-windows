@@ -6,6 +6,9 @@
 //!    `" 00000000 <delay> <padding> <valid length>..."` in hex.
 //! 2. Otherwise the audio track's edit list (`edts/elst`): the first
 //!    non-empty edit's `media_time` is the delay and its duration the length.
+//!    The duration is in the *movie* timescale; files that use a coarse one
+//!    (ffmpeg < 7 writes 1000) only know their length to ±½ tick, for every
+//!    player alike.
 
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};

@@ -14,10 +14,13 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use alsa::pcm::{Access, Format, HwParams, PCM};
-use alsa::{Direction, ValueOr};
+use ::alsa::pcm::{Access, Format, HwParams, PCM};
+use ::alsa::{Direction, ValueOr};
 
-use super::*;
+use super::{
+    bytes_per_sample, expand_rates, Backend, DeviceEvent, DeviceInfo, OutputStream, Quantizer, Render, SampleFormat,
+    StreamFormat, StreamSpec, STANDARD_RATES,
+};
 
 pub const DEFAULT_DEVICE: &str = "default";
 
@@ -96,7 +99,7 @@ impl Backend for AlsaBackend {
     fn devices(&self) -> Vec<DeviceInfo> {
         let server = if pw_metadata(&["-n", "settings", "0"]).is_some() { "PipeWire" } else { "Sound server" };
         let mut v = vec![DeviceInfo { id: DEFAULT_DEVICE.into(), name: format!("System Default ({server})") }];
-        let Ok(hints) = alsa::device_name::HintIter::new_str(None, "pcm") else { return v };
+        let Ok(hints) = ::alsa::device_name::HintIter::new_str(None, "pcm") else { return v };
         for h in hints {
             let Some(name) = h.name else { continue };
             if !is_hw(&name) || h.direction == Some(Direction::Capture) {
@@ -305,7 +308,7 @@ fn configure(id: &str, spec: &StreamSpec) -> Result<Configured, String> {
     // Start once a period is queued.
     {
         let sw = pcm.sw_params_current().map_err(|e| e.to_string())?;
-        let _ = sw.set_start_threshold(period as alsa::pcm::Frames);
+        let _ = sw.set_start_threshold(period as ::alsa::pcm::Frames);
         pcm.sw_params(&sw).map_err(|e| e.to_string())?;
     }
     Ok(Configured { pcm, fmt, period: period.max(64) })

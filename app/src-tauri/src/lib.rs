@@ -1,0 +1,84 @@
+//! FLACtastic desktop shell (Tauri 2).
+
+pub mod artwork;
+pub mod commands;
+pub mod dto;
+pub mod player_actor;
+pub mod state;
+
+use std::sync::Arc;
+
+use tauri::Manager;
+
+use crate::state::AppState;
+
+pub fn run() {
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+
+    tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Some(w) = app.get_webview_window("main") {
+                let _ = w.unminimize();
+                let _ = w.show();
+                let _ = w.set_focus();
+            }
+        }))
+        .plugin(tauri_plugin_dialog::init())
+        .register_uri_scheme_protocol("flart", |ctx, req| {
+            let st = ctx.app_handle().state::<Arc<AppState>>();
+            let (status, mime, body) = artwork::respond(&st.artwork, &req.uri().to_string());
+            tauri::http::Response::builder()
+                .status(status)
+                .header("Content-Type", mime)
+                .header("Cache-Control", "max-age=31536000, immutable")
+                .header("Access-Control-Allow-Origin", "*")
+                .body(body)
+                .unwrap()
+        })
+        .setup(|app| {
+            let state = AppState::new(app.handle());
+            app.manage(state);
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            commands::app_ready,
+            commands::app_version,
+            commands::get_settings,
+            commands::set_setting,
+            commands::open_library,
+            commands::bootstrap_library,
+            commands::refresh_library,
+            commands::library_snapshot,
+            commands::remove_tracks,
+            commands::play_tracks,
+            commands::play_next,
+            commands::add_to_queue,
+            commands::transport,
+            commands::seek,
+            commands::set_volume,
+            commands::set_repeat,
+            commands::jump_to,
+            commands::remove_from_queue,
+            commands::move_queue_track,
+            commands::set_queue_visible,
+            commands::player_snapshot,
+            commands::set_spectrum,
+            commands::output_status,
+            commands::select_output_device,
+            commands::select_output_sample_rate,
+            commands::select_output_bit_depth,
+            commands::set_exclusive_output,
+        ])
+        .build(tauri::generate_context!())
+        .expect("error while building FLACtastic")
+        .run(|app, event| {
+            if let tauri::RunEvent::Exit = event {
+                if let Some(st) = app.try_state::<Arc<AppState>>() {
+                    st.player.send(player_actor::Cmd::FlushPending);
+                    std::thread::sleep(std::time::Duration::from_millis(100));
+                    st.listening.lock().save();
+                    st.save_settings();
+                }
+            }
+        });
+}

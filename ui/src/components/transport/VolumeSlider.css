@@ -1,0 +1,47 @@
+.volume {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-tertiary);
+}
+
+/* A macOS-style slider: thin track, accent fill, white round knob. */
+.volume__slider {
+  position: relative;
+  width: 64px;
+  height: 20px;
+  touch-action: none;
+}
+
+.volume__track,
+.volume__fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+}
+
+.volume__track {
+  left: 0;
+  right: 0;
+  background: var(--surface-hover);
+}
+
+.volume__fill {
+  left: 0;
+  background: var(--accent);
+}
+
+.volume__knob {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: rgb(255 255 255);
+  box-shadow:
+    0 0.5px 1px rgb(0 0 0 / 0.35),
+    0 0 0 0.5px rgb(0 0 0 / 0.12);
+}

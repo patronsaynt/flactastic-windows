@@ -1,0 +1,102 @@
+/* collectionGutter = 36pt, cardHoverHeadroom = 8pt */
+.collection-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+}
+
+.collection-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.collection-root__head {
+  padding: 0 36px;
+  flex: none;
+}
+
+.collection-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 18px 0 12px;
+}
+
+.collection-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-scroll {
+  flex: 1;
+  overflow: auto;
+}
+
+.collection-scroll__inner {
+  padding: 8px 36px 100px;
+}
+
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+}
+
+/* GridItem(.adaptive(minimum: 180, maximum: 240)) */
+@supports (grid-template-columns: repeat(auto-fill, minmax(180px, 240px))) {
+  .album-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+.album-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.album-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.album-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.album-group__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.album-group__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--divider);
+}
+
+.album-group__count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.spin {
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
