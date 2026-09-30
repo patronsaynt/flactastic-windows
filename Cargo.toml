@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/fl-core",
     "crates/fl-tags",
+    "crates/fl-platform",
 ]
 
 [workspace.package]
