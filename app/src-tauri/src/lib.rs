@@ -7,6 +7,7 @@ pub mod dto;
 pub mod home;
 pub mod import;
 pub mod lyrics;
+pub mod organizer;
 pub mod visualizer;
 pub mod metadata;
 pub mod player_actor;
@@ -86,6 +87,13 @@ pub fn run() {
             commands::crop_image,
             home::home_metrics,
             lyrics::visualizer_lyrics,
+            organizer::organizer_plan,
+            organizer::organizer_apply,
+            organizer::organizer_examples,
+            organizer::organizer_tokens,
+            organizer::organizer_presets,
+            organizer::organizer_new_level,
+            organizer::organizer_duplicate,
             visualizer::visualizer_backdrop,
             import::import_load,
             import::import_commit,

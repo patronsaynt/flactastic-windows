@@ -34,6 +34,7 @@ pub struct AppState {
     pub highlight: Mutex<crate::home::Highlight>,
     pub staged: crate::import::Staged,
     pub lyrics: Arc<crate::lyrics::LyricsFetcher>,
+    pub organizer_plan: crate::organizer::Plan,
 }
 
 #[derive(Clone, Serialize)]
@@ -141,6 +142,7 @@ impl AppState {
             highlight: Mutex::default(),
             staged: Default::default(),
             lyrics: crate::lyrics::LyricsFetcher::new(app.clone()),
+            organizer_plan: Default::default(),
             artwork: Arc::new(ArtworkStore::new(dirs.cache.clone())),
             dirs,
             settings: Mutex::new(settings),
