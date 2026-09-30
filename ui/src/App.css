@@ -21,6 +21,28 @@
   padding: var(--space-xl) 36px 120px;
 }
 
+/* DetailBackButton: 30pt circle on the surface, pressed like a bar button. */
+.detail-back-button {
+  position: absolute;
+  left: var(--space-xl);
+  top: var(--space-lg);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  background: var(--surface);
+  transition:
+    transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1),
+    opacity 0.22s;
+}
+
+.detail-back-button:active {
+  transform: scale(0.94);
+  opacity: 0.8;
+}
+
 /* FloatingPlayerBar: max 700 wide, 16pt off the bottom. */
 .app__player-bar {
   position: absolute;

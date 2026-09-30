@@ -8,6 +8,7 @@ import { startArtistsSync } from "./app/artists";
 import { startPlaylistsSync } from "./app/playlists";
 import { ConfirmHost } from "./components/sheet/ConfirmDialog";
 import { EditorHost } from "./features/editors/EditorHost";
+import { OnboardingView } from "./features/onboarding/OnboardingView";
 import { PlaylistsTabView } from "./features/playlists/PlaylistsTabView";
 import { player, startPlayerSync, usePlayer } from "./app/player";
 import { startSettingsSync, useSetting, useSettingsStore } from "./app/settings";
@@ -35,6 +36,7 @@ export function App() {
   const uiScale = useSetting("flactastic.uiScale");
   const showDownloadTab = useSetting("flactastic.showDownloadTab");
   const settingsLoaded = useSettingsStore((s) => s.loaded);
+  const onboarded = useSetting("flactastic.hasCompletedOnboarding");
   const hasTrack = usePlayer((s) => s.currentTrack != null);
   const zoomArt = useUI((s) => s.artworkZoom);
   const queueVisible = usePlayer((s) => s.isQueueVisible);
@@ -71,6 +73,17 @@ export function App() {
   }, [showDownloadTab, tab]);
 
   useKeyboardShortcuts();
+
+  // First run: onboarding stands in for the whole window until finished.
+  if (settingsLoaded && !onboarded) {
+    return (
+      <>
+        <OnboardingView />
+        <ConfirmHost />
+        <ContextMenuHost />
+      </>
+    );
+  }
 
   const showBar = tab !== "Visualizer" && tab !== "Download";
   return (

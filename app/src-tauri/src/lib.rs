@@ -52,6 +52,7 @@ pub fn run() {
             commands::set_setting,
             commands::open_library,
             commands::bootstrap_library,
+            commands::create_default_music_folder,
             commands::refresh_library,
             commands::library_snapshot,
             commands::remove_tracks,

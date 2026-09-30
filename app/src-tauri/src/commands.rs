@@ -81,6 +81,14 @@ pub fn open_library(app: AppHandle, st: St, path: String) -> Result<(), String> 
     Ok(())
 }
 
+/// Onboarding's "Create an empty folder for me": `<app data>/Music`.
+#[tauri::command]
+pub fn create_default_music_folder(st: St) -> Result<String, String> {
+    let dir = st.dirs.data.join("Music");
+    std::fs::create_dir_all(&dir).map_err(|e| format!("Failed to create music folder: {e}"))?;
+    Ok(dir.to_string_lossy().into_owned())
+}
+
 /// Launch: reopen the saved library, or report that there's nothing to load.
 #[tauri::command]
 pub fn bootstrap_library(app: AppHandle, st: St) -> bool {

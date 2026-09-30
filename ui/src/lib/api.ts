@@ -264,6 +264,7 @@ export const api = {
 
   openLibrary: (path: string) => invoke<void>("open_library", { path }),
   bootstrapLibrary: () => invoke<boolean>("bootstrap_library"),
+  createDefaultMusicFolder: () => invoke<string>("create_default_music_folder"),
   refreshLibrary: () => invoke<void>("refresh_library"),
   librarySnapshot: () => invoke<LibrarySnapshot>("library_snapshot"),
   removeTracks: (ids: string[]) => invoke<number>("remove_tracks", { ids }),

@@ -9,6 +9,7 @@ import { useUI } from "../app/store";
  */
 export function RiseFadeIn({
   index = 0,
+  delay: fixedDelay,
   id,
   enabled = true,
   children,
@@ -17,6 +18,8 @@ export function RiseFadeIn({
   ...rest
 }: {
   index?: number;
+  /** `riseFadeIn(delay:)`: an explicit delay instead of the index stagger. */
+  delay?: number;
   id?: string;
   enabled?: boolean;
   children: ReactNode;
@@ -36,7 +39,7 @@ export function RiseFadeIn({
     return () => cancelAnimationFrame(raf);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const delay = Math.min(index * 0.015, 0.25);
+  const delay = fixedDelay ?? Math.min(index * 0.015, 0.25);
   const off = dir === "leftToRight" ? "translateX(-10px)" : dir === "rightToLeft" ? "translateX(10px)" : "translateY(10px)";
   return (
     <div
