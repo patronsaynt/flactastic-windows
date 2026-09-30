@@ -64,6 +64,12 @@
   overflow: auto;
 }
 
+/* The Mac sheet never shows a scroller; overflow stays wheel-reachable. */
+.fl-sheet__content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .fl-sheet__footer {
   padding: var(--space-lg) var(--space-xl);
 }

@@ -5,7 +5,8 @@ import type { Track } from "../../lib/api";
 import { formatDuration } from "../../lib/format";
 import { ArtworkView } from "../ArtworkView";
 import { contextMenu, menu } from "../menu/ContextMenu";
-import { addToPlaylistItem, viewAlbumItem } from "../../features/collection/menus";
+import { addToPlaylistItem, editTrackItem, viewAlbumItem } from "../../features/collection/menus";
+import { useLibrary } from "../../app/library";
 import { linksFor, withArtistItems } from "../../features/artist/ArtistLink";
 import { api } from "../../lib/api";
 import "./QueuePanel.css";
@@ -103,5 +104,8 @@ function upcomingMenu(track: Track, index: number) {
     menu.button("Remove from Queue", () => void api.removeFromQueue(index), MinusCircle),
     menu.divider,
     ...withArtistItems([viewAlbumItem(track)], linksFor(track)),
+    menu.divider,
+    // The library's copy carries the freshest tags.
+    editTrackItem(useLibrary.getState().tracksById.get(track.id) ?? track),
   ];
 }

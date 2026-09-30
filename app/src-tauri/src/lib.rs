@@ -5,6 +5,7 @@ mod artwork;
 pub mod commands;
 pub mod dto;
 pub mod home;
+pub mod metadata;
 pub mod player_actor;
 pub mod playlists;
 pub mod state;
@@ -80,6 +81,15 @@ pub fn run() {
             commands::load_image_file,
             commands::crop_image,
             home::home_metrics,
+            metadata::write_track_metadata,
+            metadata::write_tracks_metadata,
+            metadata::read_track_lyrics,
+            metadata::write_track_lyrics,
+            metadata::parse_lyrics_for_sync,
+            metadata::serialize_lrc,
+            metadata::read_track_markers,
+            metadata::write_track_markers,
+            metadata::parse_marker_timestamp,
             home::home_highlight,
             home::toggle_highlight_pin,
             playlists::playlists,

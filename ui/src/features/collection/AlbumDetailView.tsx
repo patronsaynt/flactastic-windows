@@ -12,7 +12,8 @@ import { contextMenu, menu } from "../../components/menu/ContextMenu";
 import { RiseFadeIn } from "../../components/RiseFadeIn";
 import { TrackRow } from "../../components/tracks/TrackRow";
 import { ArtistLink, withArtistItems } from "../artist/ArtistLink";
-import { addToPlaylistItem, playbackItems, removeFromLibraryItem } from "./menus";
+import { addToPlaylistItem, editTrackItem, playbackItems, removeFromLibraryItem } from "./menus";
+import { editors } from "../../app/editors";
 import "./AlbumDetailView.css";
 
 /** `AlbumDetailView` */
@@ -75,7 +76,7 @@ export function AlbumDetailView({ albumId }: { albumId: string }) {
               <ActionPill icon={Shuffle} onClick={() => playAlbum(true)}>
                 Shuffle
               </ActionPill>
-              <CircleIconButton icon={Pencil} title="Edit album" onClick={() => {}} />
+              <CircleIconButton icon={Pencil} title="Edit album" onClick={() => editors.album(album)} />
             </div>
           </div>
         </div>
@@ -92,7 +93,14 @@ export function AlbumDetailView({ albumId }: { albumId: string }) {
               }}
               onContextMenu={contextMenu(() =>
                 withArtistItems(
-                  [...playbackItems([t]), menu.divider, removeFromLibraryItem(t.title, [t]), menu.divider, addToPlaylistItem([t])],
+                  [
+                    ...playbackItems([t]),
+                    menu.divider,
+                    editTrackItem(t),
+                    removeFromLibraryItem(t.title, [t]),
+                    menu.divider,
+                    addToPlaylistItem([t]),
+                  ],
                   t.artistLinks,
                 ),
               )}

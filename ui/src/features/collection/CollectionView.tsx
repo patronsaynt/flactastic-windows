@@ -14,7 +14,7 @@ import { RiseFadeIn } from "../../components/RiseFadeIn";
 import { AlbumCard, AlbumRow } from "./AlbumCard";
 import { AlbumDetailView } from "./AlbumDetailView";
 import { AllTracksView } from "./AllTracksView";
-import { playbackItems, removeFromLibraryItem } from "./menus";
+import { editAlbumItem, playbackItems, removeFromLibraryItem } from "./menus";
 import { ArtistDetailView } from "../artist/ArtistDetailView";
 import { ArtistsCollectionView } from "../artist/ArtistsCollectionView";
 import { withArtistItems } from "../artist/ArtistLink";
@@ -200,7 +200,7 @@ function albumMenu(a: Album) {
   return contextMenu(() => {
     const byId = useLibrary.getState().tracksById;
     const tracks = a.trackIds.map((id) => byId.get(id)!).filter(Boolean);
-    const items = [...playbackItems(tracks), menu.divider, removeFromLibraryItem(a.name, tracks)];
+    const items = [...playbackItems(tracks), menu.divider, editAlbumItem(a), removeFromLibraryItem(a.name, tracks)];
     return a.isCompilation ? items : withArtistItems(items, a.albumArtistLinks);
   });
 }

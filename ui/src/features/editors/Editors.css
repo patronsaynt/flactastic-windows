@@ -1,0 +1,383 @@
+.editor-caption {
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+.pill-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--divider);
+  border-top-color: var(--text-secondary);
+  animation: spin 0.8s linear infinite;
+}
+
+/* Track / album editors: artwork column + fields column */
+.meta-editor {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  padding: var(--space-xl);
+}
+
+.meta-editor__art {
+  width: 130px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.meta-editor__art-button {
+  position: relative;
+  display: block;
+}
+
+.meta-editor__add {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.meta-editor__support {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.meta-editor__fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Album editor track list */
+.album-editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.album-editor__tracks-title {
+  padding: var(--space-md) var(--space-xl) var(--space-sm);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.album-editor__tracks {
+  max-height: 260px;
+  overflow-y: auto;
+  padding-bottom: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.album-editor__track {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px var(--space-xl);
+  transition: background-color 0.2s;
+}
+
+.album-editor__track.is-dragging {
+  background: color-mix(in srgb, var(--surface-elevated) 60%, transparent);
+}
+
+.album-editor__number {
+  width: 28px;
+  flex: none;
+  border: 0;
+  outline: none;
+  background: none;
+  text-align: right;
+  font: inherit;
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.album-editor__handle {
+  width: 18px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--text-tertiary) 60%, transparent);
+  cursor: grab;
+}
+
+.album-editor__handle.is-active {
+  color: color-mix(in srgb, var(--accent) 80%, transparent);
+}
+
+/* Merge sheet */
+.merge-list {
+  max-height: 160px;
+  overflow-y: auto;
+  padding-bottom: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.merge-list__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 2px var(--space-xl);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.merge-list__icon {
+  width: 16px;
+  flex: none;
+  color: var(--text-tertiary);
+}
+
+.merge-list__title {
+  color: var(--text-primary);
+}
+
+.merge-list__dash {
+  color: var(--text-tertiary);
+}
+
+.merge-list__artist {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Lyrics editor */
+.lyrics-editor {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  box-sizing: border-box;
+}
+
+.lyrics-editor__box {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+}
+
+.lyrics-editor__text {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  resize: none;
+  border: 0;
+  outline: none;
+  padding: var(--space-xs) var(--space-sm);
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-primary);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.fl-sheet__content:has(.lyrics-editor),
+.fl-sheet__content:has(.lyrics-sync),
+.fl-sheet__content:has(.markers-editor) {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Lyrics sync */
+.lyrics-sync {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+}
+
+.sync-button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  background: var(--surface-elevated);
+}
+
+.sync-time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.sync-divider {
+  height: 1px;
+  flex: none;
+  background: var(--divider);
+}
+
+.sync-lines {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-xs) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-elevated) 40%, transparent);
+}
+
+.sync-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding: 4px var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+.sync-line.is-active {
+  background: var(--surface-hover);
+}
+
+.sync-line__dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  align-self: center;
+}
+
+.sync-line.is-active .sync-line__dot {
+  background: var(--accent);
+}
+
+.sync-line__time {
+  width: 56px;
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.sync-line__time.is-set {
+  color: var(--text-secondary);
+}
+
+.sync-line__text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sync-line.is-active .sync-line__text {
+  color: var(--text-primary);
+}
+
+.sync-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-xs);
+}
+
+.sync-footer .editor-footer {
+  align-self: stretch;
+}
+
+/* Markers */
+.markers-editor {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+}
+
+.markers-editor__empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+}
+
+.markers-editor__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.marker-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--divider);
+}
+
+.marker-row__time {
+  width: 56px;
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.marker-row__title {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font: inherit;
+  color: var(--text-primary);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.marker-row__delete {
+  display: grid;
+  place-items: center;
+  color: var(--text-tertiary);
+  opacity: 0;
+}
+
+.marker-row:hover .marker-row__delete {
+  opacity: 1;
+}
+
+.marker-row__grip {
+  color: color-mix(in srgb, var(--text-tertiary) 60%, transparent);
+  cursor: grab;
+}

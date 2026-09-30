@@ -9,7 +9,8 @@ import { ActionPill, TrackListHeader } from "../../components/chrome/Chrome";
 import { contextMenu, menu } from "../../components/menu/ContextMenu";
 import { withArtistItems } from "../artist/ArtistLink";
 import { TrackRow } from "../../components/tracks/TrackRow";
-import { addToPlaylistItem, playbackItems, removeFromLibraryItem, viewAlbumItem } from "./menus";
+import { addToPlaylistItem, editTrackItem, playbackItems, removeFromLibraryItem, viewAlbumItem } from "./menus";
+import { editors } from "../../app/editors";
 
 function sortTracks(tracks: Track[], by: string, ascending: boolean): Track[] {
   const r = [...tracks];
@@ -137,6 +138,18 @@ export function AllTracksView({ search, sort, ascending }: { search: string; sor
                             menu.divider,
                             viewAlbumItem(t),
                             menu.divider,
+                            ...(ts.length >= 2
+                              ? [
+                                  menu.button("Merge into Album…", () =>
+                                    editors.merge(ts, () => {
+                                      setSelection(new Set());
+                                      setAnchor(null);
+                                    }),
+                                  ),
+                                  menu.divider,
+                                ]
+                              : []),
+                            editTrackItem(t),
                             removeFromLibraryItem(ts.length === 1 ? t.title : `${ts.length} Tracks`, ts),
                             menu.divider,
                             addToPlaylistItem(ts),

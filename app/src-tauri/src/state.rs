@@ -230,6 +230,19 @@ impl AppState {
         }
     }
 
+    /// `library://changed` after an in-place edit (not a scan).
+    pub fn emit_library_changed(&self, app: &AppHandle) {
+        let l = self.library.read();
+        let _ = app.emit(
+            "library://changed",
+            LibraryChanged {
+                revision: l.revision(),
+                scan_state: l.scan_state.clone(),
+                has_completed_initial_load: l.has_completed_initial_load,
+            },
+        );
+    }
+
     pub fn root_path(&self) -> Option<PathBuf> {
         self.root.read().clone()
     }

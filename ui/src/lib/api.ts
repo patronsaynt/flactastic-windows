@@ -152,6 +152,34 @@ export interface HomeHighlight {
   isPinned: boolean;
 }
 
+export type ArtworkEdit = { kind: "unchanged" } | { kind: "removed" } | { kind: "updated"; id: string };
+
+/** `MetadataWriter.write` arguments. Omit `albumArtist` to leave it alone; `null` clears it. */
+export interface TrackEdit {
+  title: string;
+  artist: string | null;
+  album: string | null;
+  year: number | null;
+  genre: string | null;
+  secondaryGenres: string[];
+  trackNumber: number | null;
+  artwork: ArtworkEdit;
+  albumArtist?: string | null;
+  compilation?: boolean | null;
+  mixCompilation?: boolean | null;
+}
+
+export interface LyricLine {
+  timestamp: number | null;
+  text: string;
+}
+
+export interface Marker {
+  id: string;
+  timestamp: number;
+  title: string;
+}
+
 export interface LoadedImage {
   id: string;
   width: number;
@@ -270,6 +298,17 @@ export const api = {
     invoke<void>("save_artist_override", { key, displayName, banner, profile }),
   resetArtistOverride: (key: string) => invoke<void>("reset_artist_override", { key }),
   loadImageFile: (path: string) => invoke<LoadedImage>("load_image_file", { path }),
+  writeTrackMetadata: (id: string, edit: TrackEdit) => invoke<void>("write_track_metadata", { id, edit }),
+  writeTracksMetadata: (albumId: string | null, edits: { id: string; edit: TrackEdit }[]) =>
+    invoke<void>("write_tracks_metadata", { albumId, edits }),
+  readTrackLyrics: (id: string) => invoke<string>("read_track_lyrics", { id }),
+  writeTrackLyrics: (id: string, lyrics: string) => invoke<void>("write_track_lyrics", { id, lyrics }),
+  parseLyricsForSync: (raw: string) => invoke<LyricLine[]>("parse_lyrics_for_sync", { raw }),
+  serializeLrc: (lines: LyricLine[]) => invoke<string>("serialize_lrc", { lines }),
+  readTrackMarkers: (id: string) => invoke<Marker[]>("read_track_markers", { id }),
+  writeTrackMarkers: (id: string, markers: Marker[]) => invoke<void>("write_track_markers", { id, markers }),
+  parseMarkerTimestamp: (text: string) => invoke<number | null>("parse_marker_timestamp", { text }),
+
   homeMetrics: (range: string) => invoke<HomeMetrics>("home_metrics", { range }),
   homeHighlight: () => invoke<HomeHighlight | null>("home_highlight"),
   toggleHighlightPin: () => invoke<HomeHighlight | null>("toggle_highlight_pin"),

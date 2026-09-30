@@ -1,8 +1,9 @@
-import { CopyPlus, LayoutGrid, ListEnd, ListStart, Plus, Trash2 } from "lucide-react";
+import { CopyPlus, LayoutGrid, ListEnd, ListStart, Pencil, Plus, Trash2 } from "lucide-react";
+import { editors } from "../../app/editors";
 import { player } from "../../app/player";
 import { useLibrary } from "../../app/library";
 import { useUI } from "../../app/store";
-import { api, type Track } from "../../lib/api";
+import { api, type Album, type Track } from "../../lib/api";
 import { platform } from "../../lib/native";
 import { requestAddToPlaylist, usePlaylists } from "../../app/playlists";
 import { confirmDialog } from "../../components/sheet/ConfirmDialog";
@@ -68,6 +69,14 @@ export function confirmRemoveFromLibrary(title: string, tracks: Track[]) {
         : `${n} files will be deleted from your library and moved to ${bin}.`,
     buttons: [{ title: "Delete from Library", destructive: true, action: () => void api.removeTracks(tracks.map((t) => t.id)) }],
   });
+}
+
+export function editTrackItem(track: Track): MenuItem {
+  return menu.button("Edit...", () => editors.track(track), Pencil);
+}
+
+export function editAlbumItem(album: Album): MenuItem {
+  return menu.button("Edit...", () => editors.album(album), Pencil);
 }
 
 export function removeFromLibraryItem(title: string, tracks: Track[]): MenuItem {

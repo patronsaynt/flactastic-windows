@@ -15,6 +15,8 @@ interface Pending {
   message?: string;
   /** Action buttons; a Cancel button is always appended. */
   buttons: ConfirmButton[];
+  /** Label of the closing button ("Cancel", or "OK" for a plain alert). */
+  cancelTitle?: string;
 }
 
 const useConfirm = create<{ pending: Pending | null }>(() => ({ pending: null }));
@@ -25,6 +27,11 @@ const useConfirm = create<{ pending: Pending | null }>(() => ({ pending: null })
  */
 export function confirmDialog(p: Pending) {
   useConfirm.setState({ pending: p });
+}
+
+/** `.alert(title) { OK } message:`, e.g. "Save Failed". */
+export function alertDialog(title: string, message?: string) {
+  useConfirm.setState({ pending: { title, message, buttons: [], cancelTitle: "OK" } });
 }
 
 export function ConfirmHost() {
@@ -51,8 +58,12 @@ export function ConfirmHost() {
                 {b.title}
               </button>
             ))}
-            <button className="alert__button" onClick={close}>
-              Cancel
+            <button
+              className={"alert__button" + (pending.buttons.length === 0 ? " is-default" : "")}
+              autoFocus={pending.buttons.length === 0}
+              onClick={close}
+            >
+              {pending.cancelTitle ?? "Cancel"}
             </button>
           </div>
         </div>

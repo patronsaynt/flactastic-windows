@@ -7,6 +7,7 @@ import { startLibrarySync, useLibrary } from "./app/library";
 import { startArtistsSync } from "./app/artists";
 import { startPlaylistsSync } from "./app/playlists";
 import { ConfirmHost } from "./components/sheet/ConfirmDialog";
+import { EditorHost } from "./features/editors/EditorHost";
 import { PlaylistsTabView } from "./features/playlists/PlaylistsTabView";
 import { player, startPlayerSync, usePlayer } from "./app/player";
 import { startSettingsSync, useSetting, useSettingsStore } from "./app/settings";
@@ -132,6 +133,7 @@ export function App() {
       <Modal open={showSettings} onClose={closeSettings}>
         <SettingsView onClose={closeSettings} />
       </Modal>
+      <EditorHost />
       <ConfirmHost />
       <ContextMenuHost />
     </div>
@@ -217,7 +219,7 @@ function useKeyboardShortcuts() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey;
-      if (e.code === "Space" && !mod && !e.altKey && !isTyping(e)) {
+      if (e.code === "Space" && !mod && !e.altKey && !isTyping(e) && !useUI.getState().lyricsSyncActive) {
         e.preventDefault();
         void player.toggle();
         return;

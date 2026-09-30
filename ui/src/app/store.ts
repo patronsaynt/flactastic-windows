@@ -23,11 +23,14 @@ interface UIState {
   playlistsPath: string[];
   artworkZoom: string | null;
   showSettings: boolean;
+  /** `PlayerState.isLyricsSyncActive`: the sync sheet owns the spacebar. */
+  lyricsSyncActive: boolean;
   returnStack: ReturnPoint[];
   /** Ids whose entrance animation already played this run (`revealed*IDs`). */
   revealed: Set<string>;
   select(tab: AppTab): void;
   setShowSettings(v: boolean): void;
+  setLyricsSyncActive(v: boolean): void;
   setArtworkZoom(id: string | null): void;
   pushCollection(v: string): void;
   navigateToAlbum(id: string): void;
@@ -85,11 +88,13 @@ export const useUI = create<UIState>((set, get) => {
     playlistsPath: [],
     artworkZoom: null,
     showSettings: false,
+    lyricsSyncActive: false,
     returnStack: [],
     revealed: new Set(),
     // A manual tab switch abandons any "return to where I came from" context.
     select: (tab) => set((s) => (tab === s.selectedTab ? {} : { selectedTab: tab, returnStack: [] })),
     setShowSettings: (v) => set({ showSettings: v }),
+    setLyricsSyncActive: (v) => set({ lyricsSyncActive: v }),
     setArtworkZoom: (id) => set({ artworkZoom: id }),
     pushCollection: (v) => set((s) => ({ collectionPath: [...s.collectionPath, v] })),
     navigateToAlbum(id) {
