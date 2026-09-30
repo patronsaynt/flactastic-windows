@@ -34,7 +34,7 @@ export function formatSampleRate(rate: number | null, bitDepth: number | null): 
   return kilohertzString(rate);
 }
 
-const formatNames = { flac: "FLAC", mp3: "MP3", wav: "WAV", aiff: "AIFF", alac: "ALAC", aac: "AAC" } as const;
+export const formatNames = { flac: "FLAC", mp3: "MP3", wav: "WAV", aiff: "AIFF", alac: "ALAC", aac: "AAC" } as const;
 
 export function techSpec(t: { fileFormat: keyof typeof formatNames; bitDepth: number | null; sampleRate: number | null } | null) {
   if (!t) return null;

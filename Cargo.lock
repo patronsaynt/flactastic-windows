@@ -1436,8 +1436,10 @@ dependencies = [
 name = "flactastic"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "crossbeam-channel",
  "env_logger",
+ "fastrand",
  "fl-audio",
  "fl-core",
  "fl-library",

@@ -105,6 +105,53 @@ export interface Playlist {
   totalDuration: number;
 }
 
+export interface RecentContext {
+  kind: "album" | "playlist";
+  targetID: string;
+  title: string;
+  subtitle: string;
+  date: number;
+}
+
+export interface RankedItem {
+  name: string;
+  plays: number;
+  minutes: number;
+}
+
+export interface AlbumRank {
+  albumId: string;
+  album: string;
+  artist: string;
+  plays: number;
+  minutes: number;
+}
+
+export interface HomeMetrics {
+  hasHistory: boolean;
+  recentlyPlayed: RecentContext[];
+  weeklyMinutes: number[];
+  weeklyDayLabels: string[];
+  hoursListened: number;
+  tracksPlayed: number;
+  albumsPlayed: number;
+  sessions: number;
+  topGenre: { name: string; share: number } | null;
+  streakDays: number;
+  topArtists: RankedItem[];
+  topAlbums: AlbumRank[];
+  footerAlbumCount: number;
+  footerHours: number;
+}
+
+export interface HomeHighlight {
+  lyric: string;
+  songTitle: string;
+  artistDisplay: string | null;
+  image: string | null;
+  isPinned: boolean;
+}
+
 export interface LoadedImage {
   id: string;
   width: number;
@@ -223,6 +270,10 @@ export const api = {
     invoke<void>("save_artist_override", { key, displayName, banner, profile }),
   resetArtistOverride: (key: string) => invoke<void>("reset_artist_override", { key }),
   loadImageFile: (path: string) => invoke<LoadedImage>("load_image_file", { path }),
+  homeMetrics: (range: string) => invoke<HomeMetrics>("home_metrics", { range }),
+  homeHighlight: () => invoke<HomeHighlight | null>("home_highlight"),
+  toggleHighlightPin: () => invoke<HomeHighlight | null>("toggle_highlight_pin"),
+
   playlists: () => invoke<Playlist[]>("playlists"),
   createPlaylist: (name: string) => invoke<string>("create_playlist", { name }),
   deletePlaylist: (id: string) => invoke<void>("delete_playlist", { id }),

@@ -40,6 +40,8 @@ const defaults = {
   "flactastic.allTracksAscending": false,
   "flactastic.visualizerMode": "albumArtLargeDetails",
   "flactastic.countedPlayFraction": 0.9,
+  "flactastic.home.statsRange": "allTime",
+  "flactastic.autoFetchArtistImages": true,
 } as const;
 
 type Known = typeof defaults;

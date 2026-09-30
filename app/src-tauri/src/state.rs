@@ -30,6 +30,8 @@ pub struct AppState {
     pub listening: Arc<Mutex<ListeningStore>>,
     pub playlists: Mutex<PlaylistStore>,
     pub artists: Arc<Artists>,
+    pub lyrics_cache: Mutex<fl_core::stores::LyricsRemoteCache>,
+    pub highlight: Mutex<crate::home::Highlight>,
 }
 
 #[derive(Clone, Serialize)]
@@ -128,8 +130,13 @@ impl AppState {
             let _ = a6.emit("artists://changed", ());
         }));
 
+        let mut lyrics_cache = fl_core::stores::LyricsRemoteCache::new(&dirs.data);
+        lyrics_cache.load();
+
         Arc::new(AppState {
             artists,
+            lyrics_cache: Mutex::new(lyrics_cache),
+            highlight: Mutex::default(),
             artwork: Arc::new(ArtworkStore::new(dirs.cache.clone())),
             dirs,
             settings: Mutex::new(settings),

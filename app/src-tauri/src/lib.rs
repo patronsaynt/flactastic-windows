@@ -4,6 +4,7 @@ pub mod artists;
 mod artwork;
 pub mod commands;
 pub mod dto;
+pub mod home;
 pub mod player_actor;
 pub mod playlists;
 pub mod state;
@@ -78,6 +79,9 @@ pub fn run() {
             commands::reset_artist_override,
             commands::load_image_file,
             commands::crop_image,
+            home::home_metrics,
+            home::home_highlight,
+            home::toggle_highlight_pin,
             playlists::playlists,
             playlists::create_playlist,
             playlists::delete_playlist,
