@@ -1,0 +1,22 @@
+[package]
+name = "fl-tags"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Vendored TagLib 2.x and a port of the macOS MetadataWriter/scanner tag access"
+links = "tag"
+
+[dependencies]
+fl-core = { path = "../fl-core" }
+thiserror.workspace = true
+log.workspace = true
+
+[build-dependencies]
+cmake = "0.1"
+cc = "1"
+
+[dev-dependencies]
+tempfile.workspace = true
+flacenc = "0.5"
