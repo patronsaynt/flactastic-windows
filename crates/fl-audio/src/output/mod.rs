@@ -2,7 +2,8 @@
 //! and channel count; each backend converts to what its device takes.
 
 pub mod null;
-// WASAPI backend: added once the core compiles (see wasapi.rs).
+#[cfg(windows)]
+pub mod wasapi;
 
 use std::sync::Arc;
 
