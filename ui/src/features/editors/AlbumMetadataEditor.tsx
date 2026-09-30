@@ -9,6 +9,7 @@ import { PillButton } from "../../components/settings/Primitives";
 import { ImageCropper, pickImage } from "../../components/editors/ImageCropper";
 import { ArtistsField, Checkbox, GenreField, MetaField, SecondaryGenresField } from "../../components/editors/Fields";
 import { artistChips, joinedChips } from "./chips";
+import { useReorder } from "../../lib/reorder";
 import "./Editors.css";
 
 interface EditableTrack {
@@ -46,7 +47,6 @@ export function AlbumMetadataEditor({ album, onClose }: { album: Album; onClose:
       .sort((a, b) => (a.trackNumber ?? Infinity) - (b.trackNumber ?? Infinity))
       .map((t, i) => ({ id: t.id, title: t.title, artists: artistChips(t.artist), trackNumber: t.trackNumber ?? i + 1, original: t })),
   );
-  const [dragging, setDragging] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(0);
 
@@ -64,17 +64,21 @@ export function AlbumMetadataEditor({ album, onClose }: { album: Album; onClose:
     }
   };
 
-  // Dragging over a row moves the dragged row there and renumbers everyone.
-  const dragEnter = (to: number) => {
-    if (dragging == null || dragging === to) return;
-    setRows((r) => {
-      const next = [...r];
-      const [item] = next.splice(dragging, 1);
-      next.splice(to, 0, item);
-      return next.map((x, i) => ({ ...x, trackNumber: i + 1 }));
-    });
-    setDragging(to);
-  };
+  // Dragging over a row moves the dragged row there and renumbers everyone
+  // (an explicit resequence; numbers are otherwise left as tagged).
+  const reorder = useReorder({
+    live: true,
+    onMove: (src, dst) =>
+      setRows((r) => {
+        const from = r.findIndex((x) => x.id === src);
+        const to = r.findIndex((x) => x.id === dst);
+        if (from < 0 || to < 0) return r;
+        const next = [...r];
+        const [item] = next.splice(from, 1);
+        next.splice(to, 0, item);
+        return next.map((x, i) => ({ ...x, trackNumber: i + 1 }));
+      }),
+  });
 
   const save = async () => {
     setSaving(true);
@@ -192,13 +196,8 @@ export function AlbumMetadataEditor({ album, onClose }: { album: Album; onClose:
           {rows.map((r, i) => (
             <div
               key={r.id}
-              className={"album-editor__track" + (dragging === i ? " is-dragging" : "")}
-              onDragEnter={() => dragEnter(i)}
-              onDragOver={(e) => dragging != null && e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragging(null);
-              }}
+              className={"album-editor__track" + (reorder.dragging === r.id ? " is-dragging" : "")}
+              {...reorder.rowProps(r.id)}
             >
               <div className="editor-row" style={{ gap: "var(--space-sm)" }}>
                 <input
@@ -216,14 +215,8 @@ export function AlbumMetadataEditor({ album, onClose }: { album: Album; onClose:
                   onChange={(e) => setRows((all) => all.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))}
                 />
                 <span
-                  className={"album-editor__handle" + (dragging === i ? " is-active" : "")}
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData("text/plain", String(i));
-                    e.dataTransfer.effectAllowed = "move";
-                    setDragging(i);
-                  }}
-                  onDragEnd={() => setDragging(null)}
+                  className={"album-editor__handle" + (reorder.dragging === r.id ? " is-active" : "")}
+                  {...reorder.handleProps(r.id)}
                 >
                   <Equal size={12} strokeWidth={2.2} />
                 </span>

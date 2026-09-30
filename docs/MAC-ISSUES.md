@@ -15,3 +15,4 @@ so it can be raised on the Mac repo.
 | 7 | Sync | receive path | A content-hash match never adopts the sender's track ID. | Fixed. |
 | 8 | Playback | `PlayerState.updateListeningTracker` | The repeat check ("last position within 2 s of the end, now under 2 s") has no backward-jump test, so on tracks shorter than 2 s it re-records a play on every 50 ms tick. | Fixed: also requires the position to have moved backwards. |
 | 9 | Metadata | `MergeTracksIntoAlbumView.save` | Calls `MetadataWriter.write` without `secondaryGenres`, which defaults to `[]`, so merging rewrites each file's GENRE with the primary genre only and drops its secondary genres. | Fixed: each track keeps its own secondary genres. |
+| 10 | Import | `ImportTrackView.save`, `ImportAlbumView.save` | Same default as #9: the imported copy's GENRE is rewritten with the primary genre only, dropping the source file's secondary genres. | Fixed: the file's secondary genres are written back. |

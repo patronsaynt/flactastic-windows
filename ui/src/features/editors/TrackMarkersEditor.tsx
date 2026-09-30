@@ -6,9 +6,9 @@ import { formatDuration } from "../../lib/format";
 import { alertDialog } from "../../components/sheet/ConfirmDialog";
 import { FLSheet } from "../../components/sheet/Sheet";
 import { PillButton } from "../../components/settings/Primitives";
+import { useReorder } from "../../lib/reorder";
 import "./Editors.css";
 
-const MIME = "text/x-fl-marker";
 
 /** `TrackMarkersEditorView`: chapter markers stored as an embedded CUESHEET. */
 export function TrackMarkersEditor({ track, onClose }: { track: Track; onClose: () => void }) {
@@ -54,6 +54,8 @@ export function TrackMarkersEditor({ track, onClose }: { track: Track; onClose: 
       return next;
     });
 
+  const reorder = useReorder({ onMove: move });
+
   const save = async () => {
     setSaving(true);
     try {
@@ -96,14 +98,9 @@ export function TrackMarkersEditor({ track, onClose }: { track: Track; onClose: 
             {markers.map((m) => (
               <div
                 key={m.id}
-                className="marker-row"
-                draggable
-                onDragStart={(e) => e.dataTransfer.setData(MIME, m.id)}
-                onDragOver={(e) => e.dataTransfer.types.includes(MIME) && e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  move(e.dataTransfer.getData(MIME), m.id);
-                }}
+                className={"marker-row" + (reorder.target === m.id && reorder.dragging !== m.id ? " is-target" : "")}
+                style={{ opacity: reorder.dragging === m.id ? 0.4 : 1 }}
+                {...reorder.rowProps(m.id)}
               >
                 <span className="marker-row__time">{formatDuration(m.timestamp)}</span>
                 <input
@@ -115,7 +112,9 @@ export function TrackMarkersEditor({ track, onClose }: { track: Track; onClose: 
                 <button className="marker-row__delete" title="Delete" onClick={() => setMarkers((all) => all.filter((x) => x.id !== m.id))}>
                   <X size={11} />
                 </button>
-                <GripHorizontal size={13} className="marker-row__grip" />
+                <span className="marker-row__grip" {...reorder.handleProps(m.id, m.title || formatDuration(m.timestamp))}>
+                  <GripHorizontal size={13} />
+                </span>
               </div>
             ))}
           </div>

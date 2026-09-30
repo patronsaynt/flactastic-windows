@@ -4,6 +4,7 @@ import { useUI } from "../../app/store";
 import { libraryTabs, tabIcons, toolTabs, type AppTab } from "../../app/tabs";
 import { springs } from "../../theme/motion";
 import { WindowControls } from "./WindowControls";
+import { AppMenuButton } from "./AppMenu";
 import "./TopBar.css";
 
 /**
@@ -15,6 +16,9 @@ export function TopBar({ showDownloadTab }: { showDownloadTab: boolean }) {
   const setShowSettings = useUI((s) => s.setShowSettings);
   return (
     <header className="top-bar" data-tauri-drag-region>
+      <div className="top-bar__leading">
+        <AppMenuButton />
+      </div>
       <div className="top-bar__center" data-tauri-drag-region>
         <TabBar showDownloadTab={showDownloadTab} />
       </div>

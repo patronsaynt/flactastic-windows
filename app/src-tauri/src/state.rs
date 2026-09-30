@@ -32,6 +32,7 @@ pub struct AppState {
     pub artists: Arc<Artists>,
     pub lyrics_cache: Mutex<fl_core::stores::LyricsRemoteCache>,
     pub highlight: Mutex<crate::home::Highlight>,
+    pub staged: crate::import::Staged,
 }
 
 #[derive(Clone, Serialize)]
@@ -137,6 +138,7 @@ impl AppState {
             artists,
             lyrics_cache: Mutex::new(lyrics_cache),
             highlight: Mutex::default(),
+            staged: Default::default(),
             artwork: Arc::new(ArtworkStore::new(dirs.cache.clone())),
             dirs,
             settings: Mutex::new(settings),

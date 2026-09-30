@@ -1,6 +1,6 @@
 import { GripHorizontal, ListMusic, MinusCircle, Volume2, X } from "lucide-react";
-import { useState } from "react";
 import { player, usePlayer } from "../../app/player";
+import { useReorder } from "../../lib/reorder";
 import type { Track } from "../../lib/api";
 import { formatDuration } from "../../lib/format";
 import { ArtworkView } from "../ArtworkView";
@@ -16,8 +16,7 @@ export function QueuePanel() {
   const queue = usePlayer((s) => s.queue);
   const currentIndex = usePlayer((s) => s.currentIndex);
   const current = usePlayer((s) => s.currentTrack);
-  const [dragging, setDragging] = useState<string | null>(null);
-  const [target, setTarget] = useState<string | null>(null);
+  const reorder = useReorder({ onMove: (src, dst) => void api.moveQueueTrack(src, dst) });
   const upcoming = queue.slice(currentIndex + 1).map((q, i) => ({ ...q, index: currentIndex + 1 + i }));
 
   return (
@@ -54,30 +53,13 @@ export function QueuePanel() {
           {upcoming.map((item) => (
             <div
               key={item.track.id}
-              className={"queue-row" + (dragging === item.track.id ? " is-dragging" : "") + (target === item.track.id && dragging !== item.track.id ? " is-target" : "")}
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.setData("text/x-fl-queue", item.track.id);
-                e.dataTransfer.effectAllowed = "move";
-                setDragging(item.track.id);
-              }}
-              onDragEnd={() => {
-                setDragging(null);
-                setTarget(null);
-              }}
-              onDragOver={(e) => {
-                if (!e.dataTransfer.types.includes("text/x-fl-queue")) return;
-                e.preventDefault();
-                setTarget(item.track.id);
-              }}
-              onDragLeave={() => setTarget((t) => (t === item.track.id ? null : t))}
-              onDrop={(e) => {
-                e.preventDefault();
-                const src = e.dataTransfer.getData("text/x-fl-queue");
-                setTarget(null);
-                setDragging(null);
-                if (src && src !== item.track.id) void api.moveQueueTrack(src, item.track.id);
-              }}
+              className={
+                "queue-row" +
+                (reorder.dragging === item.track.id ? " is-dragging" : "") +
+                (reorder.target === item.track.id && reorder.dragging !== item.track.id ? " is-target" : "")
+              }
+              {...reorder.rowProps(item.track.id)}
+              {...reorder.handleProps(item.track.id, item.track.title)}
               onDoubleClick={() => void api.jumpTo(item.index)}
               onContextMenu={contextMenu(() => upcomingMenu(item.track, item.index))}
             >
@@ -93,6 +75,7 @@ export function QueuePanel() {
           ))}
         </div>
       )}
+      {reorder.ghost}
     </div>
   );
 }

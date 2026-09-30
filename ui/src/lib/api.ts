@@ -309,6 +309,10 @@ export const api = {
   writeTrackMarkers: (id: string, markers: Marker[]) => invoke<void>("write_track_markers", { id, markers }),
   parseMarkerTimestamp: (text: string) => invoke<number | null>("parse_marker_timestamp", { text }),
 
+  importLoad: (paths: string[]) => invoke<Track[]>("import_load", { paths }),
+  importCommit: (items: { token: string; edit: TrackEdit | null }[], albumFolder: { artist: string | null; album: string } | null) =>
+    invoke<{ trackIds: string[]; error: string | null }>("import_commit", { items, albumFolder }),
+
   homeMetrics: (range: string) => invoke<HomeMetrics>("home_metrics", { range }),
   homeHighlight: () => invoke<HomeHighlight | null>("home_highlight"),
   toggleHighlightPin: () => invoke<HomeHighlight | null>("toggle_highlight_pin"),

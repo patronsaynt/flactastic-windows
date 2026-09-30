@@ -1,0 +1,103 @@
+.import-drop-pad {
+  height: 100%;
+  padding: var(--space-xl);
+  box-sizing: border-box;
+}
+
+.fl-sheet__content:has(.import-drop-pad),
+.fl-sheet__content:has(.import-loading) {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ImportDropView */
+.drop-zone {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface-elevated) 45%, transparent);
+  outline: 2px dashed var(--divider);
+  outline-offset: -2px;
+  text-align: center;
+  cursor: default;
+  transition:
+    background-color 0.12s ease-out,
+    outline-color 0.12s ease-out;
+}
+
+.drop-zone.is-targeted {
+  background: color-mix(in srgb, var(--surface-elevated) 85%, transparent);
+  outline-color: var(--accent);
+}
+
+.drop-zone__icon {
+  color: var(--text-tertiary);
+  transition: color 0.12s ease-out;
+}
+
+.drop-zone.is-targeted .drop-zone__icon {
+  color: var(--accent);
+}
+
+.drop-zone__title {
+  font-size: var(--font-headline);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.drop-zone__formats {
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+}
+
+.import-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.import-count {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+}
+
+/* ImportAlbumView track rows */
+.import-tracks {
+  max-height: 210px;
+  overflow-y: auto;
+  padding-bottom: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.import-track {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 2px var(--space-xl);
+}
+
+.import-track.is-dragging {
+  background: color-mix(in srgb, var(--surface-elevated) 60%, transparent);
+}
+
+.import-track__number {
+  width: 24px;
+  flex: none;
+  text-align: right;
+  font-size: var(--font-caption);
+  color: var(--text-tertiary);
+}

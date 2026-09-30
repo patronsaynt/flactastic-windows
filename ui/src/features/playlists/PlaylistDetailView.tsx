@@ -13,11 +13,11 @@ import { Modal } from "../../components/sheet/Sheet";
 import { TrackRow } from "../../components/tracks/TrackRow";
 import { artistMenuItems } from "../artist/ArtistLink";
 import { playbackItems } from "../collection/menus";
+import { useReorder } from "../../lib/reorder";
 import { PlaylistEditorView } from "./PlaylistEditorView";
 import "../collection/AlbumDetailView.css";
 import "./Playlists.css";
 
-const ENTRY_MIME = "text/x-fl-playlist-entry";
 
 /** `PlaylistDetailView` */
 export function PlaylistDetailView({ playlistId }: { playlistId: string }) {
@@ -28,9 +28,8 @@ export function PlaylistDetailView({ playlistId }: { playlistId: string }) {
   const currentId = usePlayer((s) => s.currentTrackId);
   const [editingName, setEditingName] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState(false);
-  const [dragging, setDragging] = useState<string | null>(null);
-  const [target, setTarget] = useState<string | null>(null);
   const closeEditor = useCallback(() => setShowEditor(false), []);
+  const reorder = useReorder({ onMove: (src, dst) => void api.movePlaylistEntry(playlistId, src, dst) });
 
   if (!playlist) return <div className="not-found">Playlist not found</div>;
   const tracks = playlistTracks(playlist);
@@ -109,35 +108,14 @@ export function PlaylistDetailView({ playlistId }: { playlistId: string }) {
             <div>
               {rows.map(({ entry, index, track }, resolvedIndex) => {
                 const playing = track.id === currentId;
-                const isTarget = target === entry.id && dragging !== entry.id;
+                const isTarget = reorder.target === entry.id && reorder.dragging !== entry.id;
                 return (
                   <div
                     key={entry.id}
                     className={"fl-row playlist-row" + (playing ? " is-filled" : "") + (isTarget ? " is-drop-target" : "")}
-                    style={{ opacity: dragging === entry.id ? 0.4 : 1 }}
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData(ENTRY_MIME, entry.id);
-                      e.dataTransfer.effectAllowed = "move";
-                      setDragging(entry.id);
-                    }}
-                    onDragEnd={() => {
-                      setDragging(null);
-                      setTarget(null);
-                    }}
-                    onDragOver={(e) => {
-                      if (!e.dataTransfer.types.includes(ENTRY_MIME)) return;
-                      e.preventDefault();
-                      if (target !== entry.id) setTarget(entry.id);
-                    }}
-                    onDragLeave={() => setTarget((t) => (t === entry.id ? null : t))}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      const src = e.dataTransfer.getData(ENTRY_MIME);
-                      setDragging(null);
-                      setTarget(null);
-                      if (src && src !== entry.id) void api.movePlaylistEntry(playlist.id, src, entry.id);
-                    }}
+                    style={{ opacity: reorder.dragging === entry.id ? 0.4 : 1 }}
+                    {...reorder.rowProps(entry.id)}
+                    {...reorder.handleProps(entry.id, track.title)}
                     onDoubleClick={() => start(resolvedIndex, undefined)}
                     onContextMenu={contextMenu(() => entryMenu(playlist, entry.id, track))}
                   >
@@ -149,6 +127,7 @@ export function PlaylistDetailView({ playlistId }: { playlistId: string }) {
           </>
         )}
       </div>
+      {reorder.ghost}
       <Modal open={showEditor} onClose={closeEditor}>
         <PlaylistEditorView playlistId={playlist.id} onClose={closeEditor} />
       </Modal>

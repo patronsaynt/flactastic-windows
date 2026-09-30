@@ -53,7 +53,7 @@ mod double_option {
     }
 }
 
-fn artwork_change(st: &AppState, a: &ArtworkEdit) -> Result<ArtworkChange, String> {
+pub(crate) fn artwork_change(st: &AppState, a: &ArtworkEdit) -> Result<ArtworkChange, String> {
     Ok(match a {
         ArtworkEdit::Unchanged => ArtworkChange::Unchanged,
         ArtworkEdit::Removed => ArtworkChange::Removed,
@@ -63,7 +63,7 @@ fn artwork_change(st: &AppState, a: &ArtworkEdit) -> Result<ArtworkChange, Strin
     })
 }
 
-fn tag_write(e: &TrackEdit, artwork: ArtworkChange) -> TagWrite {
+pub(crate) fn tag_write(e: &TrackEdit, artwork: ArtworkChange) -> TagWrite {
     TagWrite {
         title: e.title.clone(),
         artist: e.artist.clone(),
