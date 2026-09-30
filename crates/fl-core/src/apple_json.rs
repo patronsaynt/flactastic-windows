@@ -255,6 +255,98 @@ pub fn to_vec<T: Serialize + ?Sized>(value: &T) -> serde_json::Result<Vec<u8>> {
     Ok(out)
 }
 
+/// Key order of `JSONEncoder.OutputFormatting.sortedKeys`: Foundation compares
+/// keys with `[.numeric, .caseInsensitive, .forcedOrdering]`, not bytewise —
+/// `"filename"` sorts before `"fileSize"`.
+pub fn foundation_key_order(a: &str, b: &str) -> std::cmp::Ordering {
+    use std::cmp::Ordering;
+    let (ac, bc): (Vec<char>, Vec<char>) = (a.chars().collect(), b.chars().collect());
+    let (mut i, mut j) = (0, 0);
+    while i < ac.len() && j < bc.len() {
+        if ac[i].is_ascii_digit() && bc[j].is_ascii_digit() {
+            let si = i;
+            while i < ac.len() && ac[i].is_ascii_digit() {
+                i += 1;
+            }
+            let sj = j;
+            while j < bc.len() && bc[j].is_ascii_digit() {
+                j += 1;
+            }
+            let na: String = ac[si..i].iter().collect::<String>().trim_start_matches('0').to_owned();
+            let nb: String = bc[sj..j].iter().collect::<String>().trim_start_matches('0').to_owned();
+            let o = na.len().cmp(&nb.len()).then_with(|| na.cmp(&nb));
+            if o != Ordering::Equal {
+                return o;
+            }
+            continue;
+        }
+        let (x, y) = (fold_char(ac[i]), fold_char(bc[j]));
+        if x != y {
+            return x.cmp(&y);
+        }
+        i += 1;
+        j += 1;
+    }
+    match (ac.len() - i).cmp(&(bc.len() - j)) {
+        Ordering::Equal => a.cmp(b), // .forcedOrdering
+        o => o,
+    }
+}
+
+fn fold_char(c: char) -> char {
+    let mut l = c.to_lowercase();
+    match (l.next(), l.next()) {
+        (Some(x), None) => x,
+        _ => c,
+    }
+}
+
+/// `JSONEncoder` with `.sortedKeys`: Foundation key order, `\/` escaping,
+/// integral doubles without a fraction.
+pub fn to_vec_sorted<T: Serialize + ?Sized>(value: &T) -> serde_json::Result<Vec<u8>> {
+    let v = serde_json::to_value(value)?;
+    let mut out = Vec::with_capacity(256);
+    write_sorted(&mut out, &v)?;
+    Ok(out)
+}
+
+fn write_sorted(out: &mut Vec<u8>, v: &serde_json::Value) -> serde_json::Result<()> {
+    use serde_json::Value;
+    match v {
+        Value::Object(map) => {
+            let mut keys: Vec<&String> = map.keys().collect();
+            keys.sort_by(|a, b| foundation_key_order(a, b));
+            out.push(b'{');
+            for (n, k) in keys.into_iter().enumerate() {
+                if n > 0 {
+                    out.push(b',');
+                }
+                write_scalar(out, &Value::String(k.clone()))?;
+                out.push(b':');
+                write_sorted(out, &map[k])?;
+            }
+            out.push(b'}');
+        }
+        Value::Array(items) => {
+            out.push(b'[');
+            for (n, item) in items.iter().enumerate() {
+                if n > 0 {
+                    out.push(b',');
+                }
+                write_sorted(out, item)?;
+            }
+            out.push(b']');
+        }
+        scalar => write_scalar(out, scalar)?,
+    }
+    Ok(())
+}
+
+fn write_scalar(out: &mut Vec<u8>, v: &serde_json::Value) -> serde_json::Result<()> {
+    let mut ser = serde_json::Serializer::with_formatter(&mut *out, AppleFormatter);
+    v.serialize(&mut ser)
+}
+
 /// `data.write(to:options:.atomic)` — write a temp file beside the target, then rename.
 pub fn write_atomic(path: &Path, bytes: &[u8]) -> io::Result<()> {
     let dir = path.parent().unwrap_or_else(|| Path::new("."));
@@ -319,6 +411,18 @@ mod tests {
         }
         let out = to_vec(&S { p: "a/b", d: 0.75, i: 44100.0, big: 1e20 }).unwrap();
         assert_eq!(String::from_utf8(out).unwrap(), r#"{"p":"a\/b","d":0.75,"i":44100,"big":1e+20}"#);
+    }
+
+    #[test]
+    fn sorted_keys_follow_foundation() {
+        use std::cmp::Ordering::*;
+        assert_eq!(foundation_key_order("filename", "fileSize"), Less);
+        assert_eq!(foundation_key_order("deviceID", "deviceKind"), Less);
+        assert_eq!(foundation_key_order("a2", "a10"), Less);
+        assert_eq!(foundation_key_order("d", "t"), Less);
+        let v = serde_json::json!({"t":"x","d":{"fileSize":1,"filename":"a/b","z":[{"B":1,"a":2}],"n":0.5}});
+        let s = String::from_utf8(to_vec_sorted(&v).unwrap()).unwrap();
+        assert_eq!(s, r#"{"d":{"filename":"a\/b","fileSize":1,"n":0.5,"z":[{"a":2,"B":1}]},"t":"x"}"#);
     }
 
     #[test]

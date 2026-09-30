@@ -1,0 +1,4 @@
+[target.x86_64-pc-windows-msvc]
+# Vendored OpenSSL ships objects without their PDB; the linker warns once
+# per object otherwise.
+rustflags = ["-C", "link-arg=/ignore:4099"]

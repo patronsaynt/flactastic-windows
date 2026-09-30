@@ -4,6 +4,7 @@ members = [
     "crates/fl-core",
     "crates/fl-tags",
     "crates/fl-platform",
+    "crates/fl-sync",
 ]
 
 [workspace.package]
