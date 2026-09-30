@@ -1,0 +1,98 @@
+.top-bar {
+  position: relative;
+  flex: none;
+  height: var(--top-bar-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 0 16px;
+  background: var(--background);
+}
+
+.top-bar__center {
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.top-bar__center > * {
+  pointer-events: auto;
+}
+
+.top-bar__trailing {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* TabBarView: 4pt padding, 11pt continuous radius, surface fill. */
+.tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+.tab-bar__divider {
+  width: 1px;
+  height: 14px;
+  margin: 0 3px;
+  background: var(--divider);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.tab--selected {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.tab__active {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  background: var(--surface-elevated);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+  z-index: 0;
+}
+
+.tab__icon,
+.tab__label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+}
+
+/* SettingsBarButton: a resting tab inside a surface pill. */
+.bar-pill {
+  padding: 4px;
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--text-tertiary);
+}
+
+.bar-pill__inner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}

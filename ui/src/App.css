@@ -1,0 +1,22 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--background);
+}
+
+.app__main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.app__page {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+}
+
+.page-pad {
+  padding: var(--space-xl) 32px 120px;
+}

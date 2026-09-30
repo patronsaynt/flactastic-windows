@@ -1,0 +1,51 @@
+.caption {
+  display: flex;
+  align-self: stretch;
+}
+
+/* Windows 11: 46px-wide buttons spanning the top of the window. */
+.caption--win {
+  align-self: flex-start;
+  height: 32px;
+}
+
+.caption--win .caption__btn {
+  width: 46px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  transition: background-color 0.1s linear;
+}
+
+.caption--win .caption__btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.caption--win .caption__btn--close:hover {
+  background: rgb(196 43 28);
+  color: white;
+}
+
+/* Linux (GNOME/libadwaita): round 24px buttons with 6px gaps. */
+.caption--linux {
+  align-items: center;
+  gap: 6px;
+  padding-right: 12px;
+}
+
+.caption--linux .caption__btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+
+.caption--linux .caption__btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
