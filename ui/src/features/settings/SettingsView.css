@@ -1,0 +1,137 @@
+.settings {
+  width: 700px;
+  height: 560px;
+  max-height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+.settings__header {
+  position: relative;
+  height: 52px;
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+
+.wordmark {
+  aspect-ratio: 3131 / 376;
+  background: var(--text-primary);
+  opacity: 0.9;
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.settings__close {
+  position: absolute;
+  right: var(--space-xl);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  display: grid;
+}
+
+.settings__divider {
+  height: 1px;
+  background: var(--divider);
+  flex: none;
+}
+
+.settings__tabs {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 0;
+  flex: none;
+}
+
+.settings__tab {
+  position: relative;
+  padding: var(--space-sm) 14px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+}
+
+.settings__tab.is-active {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.settings__tab-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+}
+
+.settings__tab-label {
+  position: relative;
+}
+
+.settings__content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 20px 20px var(--space-xl);
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.dim {
+  color: var(--text-tertiary);
+  flex: none;
+}
+
+.library-path {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-caption);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+}
+
+.library-path.is-empty {
+  color: var(--text-tertiary);
+  direction: ltr;
+}
+
+.percent-field {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-secondary);
+  flex: none;
+}
+
+/* NSTextField .roundedBorder */
+.text-field {
+  width: 46px;
+  height: 22px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 5px;
+  text-align: right;
+  background: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.15);
+  outline: none;
+}
+
+.text-field:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+:root[data-theme="light"] .text-field {
+  background: white;
+  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.2);
+}

@@ -1,0 +1,69 @@
+.modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 40px;
+  background: rgb(0 0 0 / 0.35);
+}
+
+.modal-panel {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 60px);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 0.5px rgb(255 255 255 / 0.12),
+    0 24px 70px rgb(0 0 0 / 0.55);
+}
+
+:root[data-theme="light"] .modal-panel {
+  box-shadow:
+    0 0 0 0.5px rgb(0 0 0 / 0.15),
+    0 24px 70px rgb(0 0 0 / 0.3);
+}
+
+.fl-sheet {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  max-height: calc(100vh - 60px);
+  background: var(--surface);
+}
+
+.fl-sheet__header {
+  display: flex;
+  align-items: center;
+  padding: var(--space-xl);
+}
+
+.fl-sheet__title {
+  flex: 1;
+  font-size: var(--font-title);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fl-sheet__close {
+  color: var(--text-secondary);
+  display: grid;
+  place-items: center;
+}
+
+.fl-sheet__divider {
+  height: 1px;
+  background: var(--divider);
+  flex: none;
+}
+
+.fl-sheet__content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.fl-sheet__footer {
+  padding: var(--space-lg) var(--space-xl);
+}

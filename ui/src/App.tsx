@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Music } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Modal } from "./components/sheet/Sheet";
+import { SettingsView } from "./features/settings/SettingsView";
 import { startLibrarySync, useLibrary } from "./app/library";
 import { player, startPlayerSync, usePlayer } from "./app/player";
 import { startSettingsSync, useSetting, useSettingsStore } from "./app/settings";
@@ -31,6 +33,8 @@ export function App() {
   const hasTrack = usePlayer((s) => s.currentTrack != null);
   const zoomArt = useUI((s) => s.artworkZoom);
   const queueVisible = usePlayer((s) => s.isQueueVisible);
+  const showSettings = useUI((s) => s.showSettings);
+  const closeSettings = useCallback(() => useUI.getState().setShowSettings(false), []);
 
   useEffect(() => {
     const stops = [startSettingsSync(), startLibrarySync(), startPlayerSync()];
@@ -121,6 +125,9 @@ export function App() {
           )}
         </AnimatePresence>
       </main>
+      <Modal open={showSettings} onClose={closeSettings}>
+        <SettingsView onClose={closeSettings} />
+      </Modal>
       <ContextMenuHost />
     </div>
   );

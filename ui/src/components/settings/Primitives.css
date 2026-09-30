@@ -1,0 +1,223 @@
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.settings-group__title {
+  padding: 0 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.settings-group__body {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  background: var(--surface-elevated);
+  overflow: hidden;
+}
+
+.group-divider {
+  height: 0.5px;
+  margin-left: var(--space-lg);
+  background: var(--divider);
+  transform: scaleY(1);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.settings-row.is-top {
+  align-items: flex-start;
+}
+
+.settings-row__label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-row__title {
+  color: var(--text-primary);
+}
+
+.settings-row__subtitle {
+  font-size: var(--font-caption);
+  line-height: 1.35;
+  color: var(--text-tertiary);
+}
+
+/* NSSwitch, regular size. */
+.switch {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  flex: none;
+  border-radius: 11px;
+  background: rgb(255 255 255 / 0.18);
+  transition: background-color 0.2s ease;
+}
+
+:root[data-theme="light"] .switch {
+  background: rgb(0 0 0 / 0.12);
+}
+
+.switch.is-on {
+  background: var(--accent);
+}
+
+.switch__knob {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgb(255 255 255);
+  box-shadow:
+    0 0 0 0.5px rgb(0 0 0 / 0.15),
+    0 1px 2px rgb(0 0 0 / 0.3);
+  transition: transform 0.2s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+
+.switch.is-on .switch__knob {
+  transform: translateX(16px);
+}
+
+:root[data-theme="dark"] .switch.is-on .switch__knob,
+:root:not([data-theme]) .switch.is-on .switch__knob {
+  box-shadow:
+    0 0 0 0.5px rgb(0 0 0 / 0.35),
+    0 1px 3px rgb(0 0 0 / 0.45);
+}
+
+.switch:disabled {
+  opacity: 0.6;
+}
+
+/* NSPopUpButton */
+.popup-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 22px;
+  padding: 0 6px 0 9px;
+  border-radius: 6px;
+  font-size: var(--font-body);
+  color: var(--text-primary);
+  background: rgb(255 255 255 / 0.1);
+  box-shadow: 0 0.5px 0 rgb(255 255 255 / 0.06) inset;
+  white-space: nowrap;
+}
+
+:root[data-theme="light"] .popup-button {
+  background: rgb(255 255 255);
+  box-shadow:
+    0 0 0 0.5px rgb(0 0 0 / 0.15),
+    0 0.5px 1px rgb(0 0 0 / 0.15);
+}
+
+.popup-button svg {
+  color: var(--text-secondary);
+}
+
+.popup-button:disabled {
+  opacity: 0.5;
+}
+
+.slider {
+  position: relative;
+  flex: 1;
+  height: 20px;
+  touch-action: none;
+}
+
+.slider__track,
+.slider__fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+}
+
+.slider__track {
+  left: 0;
+  right: 0;
+  background: var(--surface-hover);
+}
+
+.slider__fill {
+  left: 0;
+  background: var(--accent);
+}
+
+.slider__knob {
+  position: absolute;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgb(255 255 255);
+  box-shadow:
+    0 0 0 0.5px rgb(0 0 0 / 0.2),
+    0 1px 2px rgb(0 0 0 / 0.35);
+}
+
+.slider.is-disabled {
+  opacity: 0.5;
+}
+
+/* PillButtonStyle */
+.pill-btn {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+  transition: transform 0.08s ease-out, background-color 0.08s ease-out;
+  flex: none;
+}
+
+.pill-btn:active {
+  transform: scale(0.96);
+  background: var(--surface-hover);
+}
+
+.pill-btn.is-primary {
+  color: var(--background);
+  background: var(--text-primary);
+}
+
+.pill-btn.is-primary:active {
+  background: var(--text-secondary);
+}
+
+.pill-btn.is-small {
+  font-size: var(--font-caption);
+}
+
+.pill-btn:disabled {
+  opacity: 0.45;
+  transform: none;
+}
+
+.settings-group .pill-btn {
+  background: var(--surface-hover);
+}
+
+.settings-group .pill-btn.is-primary {
+  background: var(--text-primary);
+}
