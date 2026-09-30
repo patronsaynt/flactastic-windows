@@ -120,6 +120,12 @@ Write-Host '[ok] node + pnpm'
 if (-not (Have cargo-tauri)) { cargo install tauri-cli --version '^2' --locked }
 Write-Host '[ok] tauri-cli'
 
+# 8. ffmpeg (test fixtures only: MP3/AAC gapless tests encode with it).
+if (-not (Have ffmpeg)) {
+    winget install --id Gyan.FFmpeg.Essentials -e --scope user --accept-package-agreements --accept-source-agreements --disable-interactivity
+}
+Write-Host '[ok] ffmpeg'
+
 Refresh-Path
 Write-Host ''
 Write-Host 'Toolchain (open a new shell to pick up PATH changes):'

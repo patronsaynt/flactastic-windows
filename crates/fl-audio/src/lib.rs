@@ -3,6 +3,7 @@
 
 pub mod decode;
 pub mod engine;
+mod mp4trim;
 pub mod output;
 pub mod output_manager;
 pub mod player;
