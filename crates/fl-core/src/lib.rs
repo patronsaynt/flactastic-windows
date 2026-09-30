@@ -4,13 +4,18 @@
 pub mod apple_json;
 pub mod cue;
 pub mod format;
+pub mod import_copy;
 pub mod library;
 pub mod listening;
 pub mod lyrics;
 pub mod metadata_cache;
 pub mod model;
+pub mod organizer;
 pub mod playlist_store;
+pub mod remote;
 pub mod resolvers;
+pub mod settings;
+pub mod stores;
 pub mod text;
 pub mod track_ids;
 

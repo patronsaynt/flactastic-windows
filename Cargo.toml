@@ -17,6 +17,7 @@ uuid = { version = "1", features = ["v4", "serde"] }
 base64 = "0.22"
 thiserror = "1"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+fastrand = "2"
 unicode-normalization = "0.1"
 icu_collator = "1.5"
 icu_locid = "1.5"
