@@ -3,8 +3,8 @@ import { player, usePlayer } from "../../app/player";
 import { ArtworkView } from "../ArtworkView";
 import { SeekBar } from "./SeekBar";
 import { VolumeSlider } from "./VolumeSlider";
-import { contextMenu } from "../menu/ContextMenu";
-import { viewAlbumItem } from "../../features/collection/menus";
+import { contextMenu, openMenuAt } from "../menu/ContextMenu";
+import { addToPlaylistChildren, viewAlbumItem } from "../../features/collection/menus";
 import { linksFor, withArtistItems } from "../../features/artist/ArtistLink";
 import "./FloatingPlayerBar.css";
 
@@ -12,7 +12,7 @@ import "./FloatingPlayerBar.css";
  * `FloatingPlayerBar`: track info left, transport centred on the full bar
  * width, add-to-playlist / queue / volume right, prominent seek bar below.
  */
-export function FloatingPlayerBar({ onAddToPlaylist }: { onAddToPlaylist?: (e: React.MouseEvent) => void }) {
+export function FloatingPlayerBar() {
   const track = usePlayer((s) => s.currentTrack);
   const isPlaying = usePlayer((s) => s.isPlaying);
   const shuffle = usePlayer((s) => s.shuffle);
@@ -56,7 +56,7 @@ export function FloatingPlayerBar({ onAddToPlaylist }: { onAddToPlaylist?: (e: R
           </div>
         </div>
         <div className="player-bar__spacer" />
-        <button className="pb-side" onClick={onAddToPlaylist} title="Add to playlist">
+        <button className="pb-side" onClick={(e) => openMenuAt(addToPlaylistChildren([track], true), e.clientX, e.clientY)} title="Add to playlist">
           <Plus size={15} strokeWidth={2} />
         </button>
         <button

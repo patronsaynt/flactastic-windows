@@ -5,7 +5,7 @@ import type { Track } from "../../lib/api";
 import { formatDuration } from "../../lib/format";
 import { ArtworkView } from "../ArtworkView";
 import { contextMenu, menu } from "../menu/ContextMenu";
-import { viewAlbumItem } from "../../features/collection/menus";
+import { addToPlaylistItem, viewAlbumItem } from "../../features/collection/menus";
 import { linksFor, withArtistItems } from "../../features/artist/ArtistLink";
 import { api } from "../../lib/api";
 import "./QueuePanel.css";
@@ -98,6 +98,8 @@ export function QueuePanel() {
 
 function upcomingMenu(track: Track, index: number) {
   return [
+    addToPlaylistItem([track]),
+    menu.divider,
     menu.button("Remove from Queue", () => void api.removeFromQueue(index), MinusCircle),
     menu.divider,
     ...withArtistItems([viewAlbumItem(track)], linksFor(track)),

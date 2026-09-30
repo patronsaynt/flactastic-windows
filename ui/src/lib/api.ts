@@ -85,6 +85,26 @@ export interface ArtistOverride {
   profile: string | null;
 }
 
+export interface PlaylistEntry {
+  id: string;
+  /** Library track id, or null when the entry no longer resolves. */
+  track: string | null;
+}
+
+export interface Playlist {
+  id: string;
+  name: string;
+  description: string | null;
+  /** Unix seconds. */
+  dateCreated: number;
+  customArtwork: string | null;
+  /** `customArtwork ?? first resolved track's artwork`. */
+  artwork: string | null;
+  entries: PlaylistEntry[];
+  trackIds: string[];
+  totalDuration: number;
+}
+
 export interface LoadedImage {
   id: string;
   width: number;
@@ -203,6 +223,21 @@ export const api = {
     invoke<void>("save_artist_override", { key, displayName, banner, profile }),
   resetArtistOverride: (key: string) => invoke<void>("reset_artist_override", { key }),
   loadImageFile: (path: string) => invoke<LoadedImage>("load_image_file", { path }),
+  playlists: () => invoke<Playlist[]>("playlists"),
+  createPlaylist: (name: string) => invoke<string>("create_playlist", { name }),
+  deletePlaylist: (id: string) => invoke<void>("delete_playlist", { id }),
+  renamePlaylist: (id: string, name: string) => invoke<void>("rename_playlist", { id, name }),
+  updatePlaylistMetadata: (id: string, name: string, description: string | null, artwork: string | null) =>
+    invoke<void>("update_playlist_metadata", { id, name, description, artwork }),
+  playlistDuplicateCount: (id: string, trackIds: string[]) => invoke<number>("playlist_duplicate_count", { id, trackIds }),
+  addToPlaylist: (id: string, trackIds: string[], skipDuplicates: boolean) =>
+    invoke<void>("add_to_playlist", { id, trackIds, skipDuplicates }),
+  createPlaylistAndAdd: (name: string, trackIds: string[]) => invoke<void>("create_playlist_and_add", { name, trackIds }),
+  removePlaylistEntries: (id: string, entryIds: string[]) => invoke<void>("remove_playlist_entries", { id, entryIds }),
+  movePlaylistEntry: (id: string, source: string, before: string) => invoke<void>("move_playlist_entry", { id, source, before }),
+  recordPlaylistPlay: (id: string) => invoke<void>("record_playlist_play", { id }),
+  recordAlbumPlay: (id: string) => invoke<void>("record_album_play", { id }),
+
   cropImage: (id: string, rect: [number, number, number, number], outWidth: number, outHeight: number) =>
     invoke<string>("crop_image", { id, rect, outWidth, outHeight }),
 };

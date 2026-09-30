@@ -9,7 +9,7 @@ import { ActionPill, TrackListHeader } from "../../components/chrome/Chrome";
 import { contextMenu, menu } from "../../components/menu/ContextMenu";
 import { withArtistItems } from "../artist/ArtistLink";
 import { TrackRow } from "../../components/tracks/TrackRow";
-import { playbackItems, viewAlbumItem } from "./menus";
+import { addToPlaylistItem, playbackItems, removeFromLibraryItem, viewAlbumItem } from "./menus";
 
 function sortTracks(tracks: Track[], by: string, ascending: boolean): Track[] {
   const r = [...tracks];
@@ -131,7 +131,18 @@ export function AllTracksView({ search, sort, ascending }: { search: string; sor
                       }}
                       onContextMenu={contextMenu(() => {
                         const ts = contextTracks(t);
-                        return withArtistItems([...playbackItems(ts), menu.divider, viewAlbumItem(t)], t.artistLinks);
+                        return withArtistItems(
+                          [
+                            ...playbackItems(ts),
+                            menu.divider,
+                            viewAlbumItem(t),
+                            menu.divider,
+                            removeFromLibraryItem(ts.length === 1 ? t.title : `${ts.length} Tracks`, ts),
+                            menu.divider,
+                            addToPlaylistItem(ts),
+                          ],
+                          t.artistLinks,
+                        );
                       })}
                     >
                       <TrackRow track={t} isPlaying={playing} displayNumber={row.index + 1} showAlbumArt showAlbumInSubtitle />

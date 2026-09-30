@@ -9,12 +9,12 @@ import { standardCompare, containsCI, plural } from "../../lib/text";
 import { PageHeader } from "../../components/PageHeader";
 import { CircleIconButton, Eyebrow, PillToggle, SortMenu } from "../../components/chrome/Chrome";
 import { SearchBar } from "../../components/chrome/SearchBar";
-import { contextMenu } from "../../components/menu/ContextMenu";
+import { contextMenu, menu } from "../../components/menu/ContextMenu";
 import { RiseFadeIn } from "../../components/RiseFadeIn";
 import { AlbumCard, AlbumRow } from "./AlbumCard";
 import { AlbumDetailView } from "./AlbumDetailView";
 import { AllTracksView } from "./AllTracksView";
-import { playbackItems } from "./menus";
+import { playbackItems, removeFromLibraryItem } from "./menus";
 import { ArtistDetailView } from "../artist/ArtistDetailView";
 import { ArtistsCollectionView } from "../artist/ArtistsCollectionView";
 import { withArtistItems } from "../artist/ArtistLink";
@@ -200,7 +200,7 @@ function albumMenu(a: Album) {
   return contextMenu(() => {
     const byId = useLibrary.getState().tracksById;
     const tracks = a.trackIds.map((id) => byId.get(id)!).filter(Boolean);
-    const items = playbackItems(tracks);
+    const items = [...playbackItems(tracks), menu.divider, removeFromLibraryItem(a.name, tracks)];
     return a.isCompilation ? items : withArtistItems(items, a.albumArtistLinks);
   });
 }

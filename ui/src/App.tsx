@@ -5,6 +5,9 @@ import { Modal } from "./components/sheet/Sheet";
 import { SettingsView } from "./features/settings/SettingsView";
 import { startLibrarySync, useLibrary } from "./app/library";
 import { startArtistsSync } from "./app/artists";
+import { startPlaylistsSync } from "./app/playlists";
+import { ConfirmHost } from "./components/sheet/ConfirmDialog";
+import { PlaylistsTabView } from "./features/playlists/PlaylistsTabView";
 import { player, startPlayerSync, usePlayer } from "./app/player";
 import { startSettingsSync, useSetting, useSettingsStore } from "./app/settings";
 import { useUI } from "./app/store";
@@ -38,7 +41,7 @@ export function App() {
   const closeSettings = useCallback(() => useUI.getState().setShowSettings(false), []);
 
   useEffect(() => {
-    const stops = [startSettingsSync(), startLibrarySync(), startPlayerSync(), startArtistsSync()];
+    const stops = [startSettingsSync(), startLibrarySync(), startPlayerSync(), startArtistsSync(), startPlaylistsSync()];
     void api.bootstrapLibrary().then((opened) => {
       // Nothing to scan: reveal the UI at once so the empty state shows.
       if (opened === false) useLibrary.setState({ hasCompletedInitialLoad: true });
@@ -129,6 +132,7 @@ export function App() {
       <Modal open={showSettings} onClose={closeSettings}>
         <SettingsView onClose={closeSettings} />
       </Modal>
+      <ConfirmHost />
       <ContextMenuHost />
     </div>
   );
@@ -140,10 +144,12 @@ function Page({ tab }: { tab: AppTab }) {
       return <HomeView />;
     case "Collection":
       return <CollectionView />;
+    case "Playlists":
+      return <PlaylistsTabView />;
     default:
       return (
         <div className="page-pad">
-          <PageHeader eyebrow={tab === "Visualizer" ? "Now Playing" : tab === "Playlists" ? "Library" : "Tools"} title={tab} />
+          <PageHeader eyebrow={tab === "Visualizer" ? "Now Playing" : "Tools"} title={tab} />
         </div>
       );
   }

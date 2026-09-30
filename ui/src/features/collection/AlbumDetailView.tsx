@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { albumTracks, useLibrary } from "../../app/library";
 import { player, usePlayer } from "../../app/player";
 import { collectionBackTitle, useUI } from "../../app/store";
-import type { Album } from "../../lib/api";
+import { api, type Album } from "../../lib/api";
 import { formatDuration } from "../../lib/format";
 import { plural } from "../../lib/text";
 import { ArtworkView } from "../../components/ArtworkView";
@@ -12,7 +12,7 @@ import { contextMenu, menu } from "../../components/menu/ContextMenu";
 import { RiseFadeIn } from "../../components/RiseFadeIn";
 import { TrackRow } from "../../components/tracks/TrackRow";
 import { ArtistLink, withArtistItems } from "../artist/ArtistLink";
-import { playbackItems } from "./menus";
+import { addToPlaylistItem, playbackItems, removeFromLibraryItem } from "./menus";
 import "./AlbumDetailView.css";
 
 /** `AlbumDetailView` */
@@ -41,6 +41,7 @@ export function AlbumDetailView({ albumId }: { albumId: string }) {
   const playAlbum = (shuffle: boolean) => {
     const start = shuffle ? Math.floor(Math.random() * tracks.length) : 0;
     void player.play(tracks, start, album.name, shuffle);
+    void api.recordAlbumPlay(album.id);
   };
 
   const pieces: string[] = [];
@@ -85,8 +86,16 @@ export function AlbumDetailView({ albumId }: { albumId: string }) {
               key={t.id}
               index={i}
               className={"fl-row" + (t.id === currentId ? " is-filled" : "")}
-              onDoubleClick={() => void player.play(tracks, i, album.name)}
-              onContextMenu={contextMenu(() => withArtistItems([...playbackItems([t]), menu.divider], t.artistLinks))}
+              onDoubleClick={() => {
+                void player.play(tracks, i, album.name);
+                void api.recordAlbumPlay(album.id);
+              }}
+              onContextMenu={contextMenu(() =>
+                withArtistItems(
+                  [...playbackItems([t]), menu.divider, removeFromLibraryItem(t.title, [t]), menu.divider, addToPlaylistItem([t])],
+                  t.artistLinks,
+                ),
+              )}
             >
               <TrackRow track={t} isPlaying={t.id === currentId} />
             </RiseFadeIn>

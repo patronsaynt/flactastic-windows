@@ -5,6 +5,7 @@ mod artwork;
 pub mod commands;
 pub mod dto;
 pub mod player_actor;
+pub mod playlists;
 pub mod state;
 
 use std::sync::Arc;
@@ -77,6 +78,18 @@ pub fn run() {
             commands::reset_artist_override,
             commands::load_image_file,
             commands::crop_image,
+            playlists::playlists,
+            playlists::create_playlist,
+            playlists::delete_playlist,
+            playlists::rename_playlist,
+            playlists::update_playlist_metadata,
+            playlists::playlist_duplicate_count,
+            playlists::add_to_playlist,
+            playlists::create_playlist_and_add,
+            playlists::remove_playlist_entries,
+            playlists::move_playlist_entry,
+            playlists::record_playlist_play,
+            playlists::record_album_play,
         ])
         .build(tauri::generate_context!())
         .expect("error while building FLACtastic")
