@@ -18,5 +18,91 @@
 }
 
 .page-pad {
-  padding: var(--space-xl) 32px 120px;
+  padding: var(--space-xl) 36px 120px;
+}
+
+/* FloatingPlayerBar: max 700 wide, 16pt off the bottom. */
+.app__player-bar {
+  position: absolute;
+  left: calc(50% - min(350px, (100% - 32px) / 2));
+  bottom: 16px;
+  width: min(700px, calc(100% - 32px));
+  z-index: 20;
+}
+
+/* QueuePanelView: 340 wide, lg padding top/right, 16 bottom. */
+.app__queue {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  bottom: 16px;
+  width: 340px;
+  z-index: 21;
+}
+
+.loading-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  background: var(--background);
+  transition: opacity 0.35s ease-out;
+}
+
+.loading-cover.is-fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-cover__icon {
+  color: var(--text-secondary);
+  animation: pulse 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  to {
+    opacity: 0.5;
+  }
+}
+
+.loading-cover__text {
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.artwork-zoom {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgb(0 0 0 / 0.55);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+}
+
+.artwork-zoom__art {
+  flex: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* PillButtonStyle (modal sheets / Back). */
+.pill-button {
+  margin-bottom: var(--space-xl);
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+}
+
+.pill-button:hover {
+  background: var(--surface-hover);
 }
