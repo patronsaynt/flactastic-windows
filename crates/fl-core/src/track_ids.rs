@@ -48,7 +48,10 @@ impl TrackIdStore {
     /// Loads `<root>/.flactastic/track-ids.json`. Call before scanning.
     pub fn load(&mut self, root: &Path) {
         let dir = sidecar_dir(root);
-        let _ = std::fs::create_dir_all(&dir);
+        // Never recreate a missing library root as a side effect.
+        if root.is_dir() {
+            let _ = std::fs::create_dir(&dir);
+        }
         let url = dir.join("track-ids.json");
         self.cache.clear();
         match apple_json::load::<HashMap<String, Uid>>(&url) {

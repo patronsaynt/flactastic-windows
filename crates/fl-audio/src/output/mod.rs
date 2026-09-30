@@ -1,6 +1,8 @@
 //! Output backends. The engine renders interleaved f32 at the stream's rate
 //! and channel count; each backend converts to what its device takes.
 
+#[cfg(target_os = "linux")]
+pub mod alsa;
 pub mod null;
 #[cfg(windows)]
 pub mod wasapi;
@@ -26,8 +28,10 @@ pub enum SampleFormat {
     I16,
     /// 24-bit packed in 3 bytes.
     I24,
-    /// 24 valid bits in a 32-bit container.
+    /// 24 valid bits in a 32-bit container, MSB-aligned (WASAPI).
     I24In32,
+    /// 24 valid bits in the low bytes of a 32-bit container (ALSA `S24_LE`).
+    I24In32Lsb,
     I32,
 }
 
@@ -35,7 +39,7 @@ impl SampleFormat {
     pub fn bits(self) -> u32 {
         match self {
             Self::I16 => 16,
-            Self::I24 | Self::I24In32 => 24,
+            Self::I24 | Self::I24In32 | Self::I24In32Lsb => 24,
             Self::F32 | Self::I32 => 32,
         }
     }
@@ -176,6 +180,11 @@ impl Quantizer {
                     d.copy_from_slice(&(self.quantize(*s, 24) << 8).to_le_bytes());
                 }
             }
+            SampleFormat::I24In32Lsb => {
+                for (s, d) in src.iter().zip(dst.chunks_exact_mut(4)) {
+                    d.copy_from_slice(&self.quantize(*s, 24).to_le_bytes());
+                }
+            }
             SampleFormat::I32 => {
                 for (s, d) in src.iter().zip(dst.chunks_exact_mut(4)) {
                     // f32 carries 24 bits of mantissa; scale without dither.
@@ -191,7 +200,7 @@ pub fn bytes_per_sample(fmt: SampleFormat) -> usize {
     match fmt {
         SampleFormat::I16 => 2,
         SampleFormat::I24 => 3,
-        SampleFormat::F32 | SampleFormat::I24In32 | SampleFormat::I32 => 4,
+        SampleFormat::F32 | SampleFormat::I24In32 | SampleFormat::I24In32Lsb | SampleFormat::I32 => 4,
     }
 }
 

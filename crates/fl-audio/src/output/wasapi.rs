@@ -127,7 +127,7 @@ fn extensible(rate: u32, channels: u16, fmt: SampleFormat) -> WAVEFORMATEXTENSIB
         SampleFormat::F32 => (32, 32, SUBTYPE_FLOAT),
         SampleFormat::I16 => (16, 16, SUBTYPE_PCM),
         SampleFormat::I24 => (24, 24, SUBTYPE_PCM),
-        SampleFormat::I24In32 => (32, 24, SUBTYPE_PCM),
+        SampleFormat::I24In32 | SampleFormat::I24In32Lsb => (32, 24, SUBTYPE_PCM),
         SampleFormat::I32 => (32, 32, SUBTYPE_PCM),
     };
     let block = channels * container / 8;

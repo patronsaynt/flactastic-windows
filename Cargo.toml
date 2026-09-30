@@ -7,6 +7,7 @@ members = [
     "crates/fl-sync",
     "crates/fl-conformance",
     "crates/fl-audio",
+    "crates/fl-library",
 ]
 
 [workspace.package]

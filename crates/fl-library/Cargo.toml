@@ -1,0 +1,22 @@
+[package]
+name = "fl-library"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "LibraryScanner + LibraryStore: folder scan, metadata load with the sidecar cache, stable IDs, album grouping"
+
+[dependencies]
+fl-core = { path = "../fl-core" }
+fl-tags = { path = "../fl-tags" }
+fl-audio = { path = "../fl-audio" }
+fl-platform = { path = "../fl-platform" }
+log.workspace = true
+serde.workspace = true
+parking_lot = "0.12"
+walkdir = "2"
+
+[dev-dependencies]
+tempfile.workspace = true
+flacenc = "0.5"
