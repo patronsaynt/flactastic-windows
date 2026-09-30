@@ -167,15 +167,23 @@ export function PillButton({
   onClick,
   disabled,
   small,
+  muted,
 }: {
   primary?: boolean;
+  /** Tertiary text, for secondary actions like "Reset to Default". */
+  muted?: boolean;
   children: ReactNode;
   onClick: () => void;
   disabled?: boolean;
   small?: boolean;
 }) {
   return (
-    <button className={"pill-btn" + (primary ? " is-primary" : "") + (small ? " is-small" : "")} onClick={onClick} disabled={disabled}>
+    <button
+      className={"pill-btn" + (primary ? " is-primary" : "") + (small ? " is-small" : "")}
+      style={muted ? { color: "var(--text-tertiary)" } : undefined}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

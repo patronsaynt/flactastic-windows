@@ -11,7 +11,7 @@ import { ActionPill, BackLink, CircleIconButton, Eyebrow, TrackListHeader } from
 import { contextMenu, menu } from "../../components/menu/ContextMenu";
 import { RiseFadeIn } from "../../components/RiseFadeIn";
 import { TrackRow } from "../../components/tracks/TrackRow";
-import { displayCredit } from "./AlbumCard";
+import { ArtistLink, withArtistItems } from "../artist/ArtistLink";
 import { playbackItems } from "./menus";
 import "./AlbumDetailView.css";
 
@@ -62,7 +62,7 @@ export function AlbumDetailView({ albumId }: { albumId: string }) {
             <Eyebrow>{album.isMixCompilation ? "Mix Compilation" : "Album"}</Eyebrow>
             <h1 className="album-header__title">{album.name}</h1>
             <div className="album-header__meta">
-              <span>{album.isCompilation ? "Compilation" : album.artist ? displayCredit(album.artist) : "Unknown Artist"}</span>
+              {album.isCompilation ? <span>Compilation</span> : <ArtistLink links={album.artistLinks} />}
               {pieces.map((p, i) => (
                 <span key={i}> · {p}</span>
               ))}
@@ -86,7 +86,7 @@ export function AlbumDetailView({ albumId }: { albumId: string }) {
               index={i}
               className={"fl-row" + (t.id === currentId ? " is-filled" : "")}
               onDoubleClick={() => void player.play(tracks, i, album.name)}
-              onContextMenu={contextMenu(() => [...playbackItems([t]), menu.divider])}
+              onContextMenu={contextMenu(() => withArtistItems([...playbackItems([t]), menu.divider], t.artistLinks))}
             >
               <TrackRow track={t} isPlaying={t.id === currentId} />
             </RiseFadeIn>

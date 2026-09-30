@@ -21,6 +21,7 @@ fl-tags = { path = "../../crates/fl-tags" }
 fl-audio = { path = "../../crates/fl-audio" }
 fl-library = { path = "../../crates/fl-library" }
 fl-platform = { path = "../../crates/fl-platform" }
+fl-net = { path = "../../crates/fl-net" }
 tauri = { version = "2", features = ["tray-icon", "image-png"] }
 tauri-plugin-dialog = "2"
 tauri-plugin-single-instance = "2"

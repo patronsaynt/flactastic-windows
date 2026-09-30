@@ -1,0 +1,189 @@
+.artist-page {
+  position: relative;
+  height: 100%;
+  background: var(--background);
+}
+
+.artist-page__scroll {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.artist-banner {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+}
+
+.artist-banner__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artist-banner__image.is-blurred {
+  filter: blur(30px);
+}
+
+.artist-banner__fade {
+  position: absolute;
+  inset: 0;
+}
+
+.artist-banner__content {
+  position: absolute;
+  left: var(--space-xl);
+  right: var(--space-xl);
+  bottom: var(--space-xl);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+}
+
+.artist-banner__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.artist-banner__eyebrow {
+  font-size: var(--font-caption);
+  letter-spacing: 2px;
+  color: rgb(255 255 255 / 0.7);
+}
+
+/* 56pt heavy, two lines, shrinking to half on narrow windows. */
+.artist-banner__name {
+  margin: 0;
+  font-size: clamp(28px, 4.2vw, 56px);
+  font-weight: 800;
+  line-height: 1.08;
+  color: white;
+  text-shadow: 0 0 8px rgb(0 0 0 / 0.33);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.artist-banner__subtitle {
+  font-size: var(--font-caption);
+  color: rgb(255 255 255 / 0.85);
+}
+
+.artist-banner__actions {
+  display: flex;
+  gap: var(--space-md);
+  padding-top: var(--space-xs);
+}
+
+.artist-page .pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.artist-section {
+  flex: none;
+  padding: 0 var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.artist-section__title {
+  font-size: var(--font-headline);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* GridItem(.adaptive(minimum: 160, maximum: 220), spacing: 16), rows 24 apart */
+.artist-section__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  column-gap: var(--space-lg);
+  row-gap: var(--space-xl);
+}
+
+/* DetailBackButton */
+.detail-back-button {
+  position: absolute;
+  left: var(--space-xl);
+  top: var(--space-lg);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  background: var(--surface);
+  transition:
+    transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1),
+    opacity 0.22s;
+}
+
+.detail-back-button:active {
+  transform: scale(0.94);
+  opacity: 0.8;
+}
+
+/* ArtistEditorView */
+.artist-editor__banner {
+  position: relative;
+  height: 120px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface-elevated);
+  display: grid;
+  place-items: center;
+}
+
+.artist-editor__banner img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artist-editor__hint {
+  position: relative;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.artist-editor__profile {
+  width: 100px;
+  height: 100px;
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--surface-elevated);
+  color: color-mix(in srgb, var(--text-tertiary) 60%, transparent);
+  box-shadow: inset 0 0 0 1px var(--divider);
+}
+
+.artist-editor__profile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artist-link {
+  font: inherit;
+  color: inherit;
+}
+
+.artist-link:hover {
+  color: var(--text-primary);
+}

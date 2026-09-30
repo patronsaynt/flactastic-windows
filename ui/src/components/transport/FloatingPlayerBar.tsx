@@ -3,6 +3,9 @@ import { player, usePlayer } from "../../app/player";
 import { ArtworkView } from "../ArtworkView";
 import { SeekBar } from "./SeekBar";
 import { VolumeSlider } from "./VolumeSlider";
+import { contextMenu } from "../menu/ContextMenu";
+import { viewAlbumItem } from "../../features/collection/menus";
+import { linksFor, withArtistItems } from "../../features/artist/ArtistLink";
 import "./FloatingPlayerBar.css";
 
 /**
@@ -42,7 +45,10 @@ export function FloatingPlayerBar({ onAddToPlaylist }: { onAddToPlaylist?: (e: R
           </button>
         </div>
 
-        <div className="player-bar__info">
+        <div
+          className="player-bar__info"
+          onContextMenu={contextMenu(() => withArtistItems([viewAlbumItem(track)], linksFor(track)))}
+        >
           <ArtworkView artwork={track.artwork} size={48} />
           <div className="player-bar__text">
             <div className="player-bar__title">{track.title}</div>

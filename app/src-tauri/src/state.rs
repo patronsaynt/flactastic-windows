@@ -15,6 +15,7 @@ use parking_lot::{Mutex, RwLock};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 
+use crate::artists::Artists;
 use crate::artwork::ArtworkStore;
 use crate::player_actor::{self, Callbacks, PlayerHandle};
 
@@ -28,6 +29,7 @@ pub struct AppState {
     pub artwork: Arc<ArtworkStore>,
     pub listening: Arc<Mutex<ListeningStore>>,
     pub playlists: Mutex<PlaylistStore>,
+    pub artists: Arc<Artists>,
 }
 
 #[derive(Clone, Serialize)]
@@ -121,7 +123,13 @@ impl AppState {
             callbacks,
         );
 
+        let a6 = app.clone();
+        let artists = Artists::new(&dirs.data, Arc::new(move || {
+            let _ = a6.emit("artists://changed", ());
+        }));
+
         Arc::new(AppState {
+            artists,
             artwork: Arc::new(ArtworkStore::new(dirs.cache.clone())),
             dirs,
             settings: Mutex::new(settings),
@@ -188,6 +196,7 @@ impl AppState {
         if e == LibraryEvent::InitialLoadCompleted {
             let albums = self.library.write().albums();
             self.artwork.prewarm((*albums).clone(), 2.0);
+            self.prefetch_artist_images();
         }
         let _ = app.emit("library://changed", payload);
     }
@@ -198,6 +207,20 @@ impl AppState {
         let tracks = l.tracks();
         let by_id: std::collections::HashMap<Uid, &Track> = tracks.iter().map(|t| (t.id, t)).collect();
         ids.iter().filter_map(|s| Uid::parse(s)).filter_map(|id| by_id.get(&id).map(|t| (*t).clone())).collect()
+    }
+
+    /// `prefetchArtistImages`: warm every artist's picture after the first load.
+    pub fn prefetch_artist_images(&self) {
+        if !self.settings.lock().auto_fetch_artist_images {
+            return;
+        }
+        let (tracks, albums) = {
+            let mut l = self.library.write();
+            (l.tracks(), l.albums())
+        };
+        for s in self.artists.summaries(&tracks, &albums) {
+            self.artists.ensure_image(&s.id, &s.display_name);
+        }
     }
 
     pub fn root_path(&self) -> Option<PathBuf> {

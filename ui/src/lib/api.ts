@@ -33,6 +33,13 @@ export interface Track {
   dateAdded: number | null;
   /** Artwork content id for `artworkUrl`. */
   artwork: string | null;
+  /** `artist ?? albumArtist` split into linkable artists (library tracks only). */
+  artistLinks?: ArtistLinkPiece[];
+}
+
+export interface ArtistLinkPiece {
+  name: string;
+  key: string;
 }
 
 export interface Album {
@@ -48,6 +55,40 @@ export interface Album {
   totalDuration: number;
   isCompilation: boolean;
   isMixCompilation: boolean;
+  /** `album.artist` as links (detail header). */
+  artistLinks: ArtistLinkPiece[];
+  /** `albumArtist ?? artist` as links (context menu). */
+  albumArtistLinks: ArtistLinkPiece[];
+}
+
+export interface Artist {
+  id: string;
+  displayName: string;
+  albumIds: string[];
+  singleIds: string[];
+  appearsOnIds: string[];
+  trackCount: number;
+  artworkSample: string | null;
+  image: string | null;
+}
+
+export interface ArtistDetail {
+  artist: Artist;
+  banner: string | null;
+  bannerIsTrue: boolean;
+  baseColor: [number, number, number] | null;
+}
+
+export interface ArtistOverride {
+  displayName: string | null;
+  banner: string | null;
+  profile: string | null;
+}
+
+export interface LoadedImage {
+  id: string;
+  width: number;
+  height: number;
 }
 
 export type ScanState =
@@ -153,6 +194,17 @@ export const api = {
   selectOutputSampleRate: (rate: number | null) => invoke<void>("select_output_sample_rate", { rate }),
   selectOutputBitDepth: (bits: number | null) => invoke<void>("select_output_bit_depth", { bits }),
   setExclusiveOutput: (enabled: boolean) => invoke<void>("set_exclusive_output", { enabled }),
+
+  artists: () => invoke<Artist[]>("artists"),
+  artistDetail: (key: string) => invoke<ArtistDetail | null>("artist_detail", { key }),
+  ensureArtistImage: (key: string, displayName: string) => invoke<void>("ensure_artist_image", { key, displayName }),
+  artistOverride: (key: string) => invoke<ArtistOverride>("artist_override", { key }),
+  saveArtistOverride: (key: string, displayName: string | null, banner: string | null, profile: string | null) =>
+    invoke<void>("save_artist_override", { key, displayName, banner, profile }),
+  resetArtistOverride: (key: string) => invoke<void>("reset_artist_override", { key }),
+  loadImageFile: (path: string) => invoke<LoadedImage>("load_image_file", { path }),
+  cropImage: (id: string, rect: [number, number, number, number], outWidth: number, outHeight: number) =>
+    invoke<string>("crop_image", { id, rect, outWidth, outHeight }),
 };
 
 export function on<T>(event: string, cb: (payload: T) => void): () => void {

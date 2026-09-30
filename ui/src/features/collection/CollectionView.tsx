@@ -15,6 +15,9 @@ import { AlbumCard, AlbumRow } from "./AlbumCard";
 import { AlbumDetailView } from "./AlbumDetailView";
 import { AllTracksView } from "./AllTracksView";
 import { playbackItems } from "./menus";
+import { ArtistDetailView } from "../artist/ArtistDetailView";
+import { ArtistsCollectionView } from "../artist/ArtistsCollectionView";
+import { withArtistItems } from "../artist/ArtistLink";
 import "./CollectionView.css";
 
 type SortOption = "Album" | "Artist" | "Year" | "Genre";
@@ -32,7 +35,7 @@ export function CollectionView() {
         {top == null ? (
           <CollectionRoot />
         ) : route.artistKey(top) != null ? (
-          <div className="page-pad">Artist pages are coming in the next step.</div>
+          <ArtistDetailView artistKey={route.artistKey(top)!} />
         ) : (
           <AlbumDetailView albumId={top} />
         )}
@@ -185,7 +188,7 @@ function CollectionRoot() {
               </div>
             </div>
           )}
-          {mode === "artists" && <div className="collection-scroll__inner">Artists are coming in the next step.</div>}
+          {mode === "artists" && <ArtistsCollectionView search={search} />}
           {mode === "tracks" && <AllTracksView search={search} sort={tracksSort} ascending={ascending} />}
         </motion.div>
       </AnimatePresence>
@@ -197,7 +200,8 @@ function albumMenu(a: Album) {
   return contextMenu(() => {
     const byId = useLibrary.getState().tracksById;
     const tracks = a.trackIds.map((id) => byId.get(id)!).filter(Boolean);
-    return playbackItems(tracks);
+    const items = playbackItems(tracks);
+    return a.isCompilation ? items : withArtistItems(items, a.albumArtistLinks);
   });
 }
 

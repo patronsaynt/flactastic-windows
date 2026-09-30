@@ -4,7 +4,7 @@
 use std::path::Path;
 
 use fl_core::model::{artwork_content_id, relative_path};
-use fl_core::{Album, AudioQuality, Track};
+use fl_core::{Album, ArtistResolver, AudioQuality, Track};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize)]
@@ -34,6 +34,25 @@ pub struct TrackDto {
     pub date_added: Option<f64>,
     /// `artwork_content_id` of the embedded picture.
     pub artwork: Option<String>,
+    /// `artist ?? albumArtist` resolved into linkable artists (library
+    /// snapshots only; the queue looks tracks up by id).
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub artist_links: Vec<ArtistLink>,
+}
+
+/// One linkable piece of a credit (`ArtistLink` / `artistContextMenuItems`).
+#[derive(Debug, Clone, Serialize)]
+pub struct ArtistLink {
+    pub name: String,
+    pub key: String,
+}
+
+pub fn artist_links(resolver: &ArtistResolver, credit: Option<&str>) -> Vec<ArtistLink> {
+    resolver
+        .split(credit)
+        .into_iter()
+        .map(|name| ArtistLink { key: ArtistResolver::key(&name), name })
+        .collect()
 }
 
 impl TrackDto {
@@ -44,7 +63,7 @@ impl TrackDto {
             rel_path: root.and_then(|r| relative_path(&t.path, r)),
             title: t.title.clone(),
             artist: t.artist.clone(),
-            artist_display: fl_core::ArtistResolver::display_string(t.artist.as_deref()),
+            artist_display: ArtistResolver::display_string(t.artist.as_deref()),
             album_artist: t.album_artist.clone(),
             album: t.album.clone(),
             track_number: t.track_number,
@@ -60,7 +79,13 @@ impl TrackDto {
             is_mix_compilation: t.is_mix_compilation,
             date_added: t.date_added.map(|d| d.unix_seconds()),
             artwork: t.artwork.as_ref().map(|a| artwork_content_id(a)),
+            artist_links: Vec::new(),
         }
+    }
+
+    pub fn with_links(mut self, t: &Track, resolver: &ArtistResolver) -> TrackDto {
+        self.artist_links = artist_links(resolver, t.artist.as_deref().or(t.album_artist.as_deref()));
+        self
     }
 }
 
@@ -79,10 +104,14 @@ pub struct AlbumDto {
     pub total_duration: f64,
     pub is_compilation: bool,
     pub is_mix_compilation: bool,
+    /// `album.artist` as links (the detail header's `ArtistLink`).
+    pub artist_links: Vec<ArtistLink>,
+    /// `albumArtist ?? artist` as links (the context menu).
+    pub album_artist_links: Vec<ArtistLink>,
 }
 
 impl AlbumDto {
-    pub fn from_album(a: &Album) -> AlbumDto {
+    pub fn from_album(a: &Album, resolver: &ArtistResolver) -> AlbumDto {
         AlbumDto {
             id: a.id.clone(),
             name: a.name.clone(),
@@ -96,6 +125,8 @@ impl AlbumDto {
             total_duration: a.total_duration(),
             is_compilation: a.is_compilation(),
             is_mix_compilation: a.is_mix_compilation(),
+            artist_links: artist_links(resolver, a.artist.as_deref()),
+            album_artist_links: artist_links(resolver, a.album_artist.as_deref().or(a.artist.as_deref())),
         }
     }
 }

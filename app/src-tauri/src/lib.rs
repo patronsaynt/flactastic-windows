@@ -1,6 +1,7 @@
 //! FLACtastic desktop shell (Tauri 2).
 
-pub mod artwork;
+pub mod artists;
+mod artwork;
 pub mod commands;
 pub mod dto;
 pub mod player_actor;
@@ -68,6 +69,14 @@ pub fn run() {
             commands::select_output_sample_rate,
             commands::select_output_bit_depth,
             commands::set_exclusive_output,
+            commands::artists,
+            commands::artist_detail,
+            commands::ensure_artist_image,
+            commands::artist_override,
+            commands::save_artist_override,
+            commands::reset_artist_override,
+            commands::load_image_file,
+            commands::crop_image,
         ])
         .build(tauri::generate_context!())
         .expect("error while building FLACtastic")

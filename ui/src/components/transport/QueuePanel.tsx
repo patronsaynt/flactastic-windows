@@ -6,6 +6,7 @@ import { formatDuration } from "../../lib/format";
 import { ArtworkView } from "../ArtworkView";
 import { contextMenu, menu } from "../menu/ContextMenu";
 import { viewAlbumItem } from "../../features/collection/menus";
+import { linksFor, withArtistItems } from "../../features/artist/ArtistLink";
 import { api } from "../../lib/api";
 import "./QueuePanel.css";
 
@@ -38,7 +39,7 @@ export function QueuePanel() {
           {current && (
             <>
               <div className="queue-panel__section">Now Playing</div>
-              <div className="queue-now" onContextMenu={contextMenu(() => [viewAlbumItem(current)])}>
+              <div className="queue-now" onContextMenu={contextMenu(() => withArtistItems([viewAlbumItem(current)], linksFor(current)))}>
                 <ArtworkView artwork={current.artwork} size={48} />
                 <div className="queue-row__text">
                   <div className="queue-now__title">{current.title}</div>
@@ -99,6 +100,6 @@ function upcomingMenu(track: Track, index: number) {
   return [
     menu.button("Remove from Queue", () => void api.removeFromQueue(index), MinusCircle),
     menu.divider,
-    viewAlbumItem(track),
+    ...withArtistItems([viewAlbumItem(track)], linksFor(track)),
   ];
 }

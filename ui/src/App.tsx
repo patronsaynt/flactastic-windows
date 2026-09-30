@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Modal } from "./components/sheet/Sheet";
 import { SettingsView } from "./features/settings/SettingsView";
 import { startLibrarySync, useLibrary } from "./app/library";
+import { startArtistsSync } from "./app/artists";
 import { player, startPlayerSync, usePlayer } from "./app/player";
 import { startSettingsSync, useSetting, useSettingsStore } from "./app/settings";
 import { useUI } from "./app/store";
@@ -37,7 +38,7 @@ export function App() {
   const closeSettings = useCallback(() => useUI.getState().setShowSettings(false), []);
 
   useEffect(() => {
-    const stops = [startSettingsSync(), startLibrarySync(), startPlayerSync()];
+    const stops = [startSettingsSync(), startLibrarySync(), startPlayerSync(), startArtistsSync()];
     void api.bootstrapLibrary().then((opened) => {
       // Nothing to scan: reveal the UI at once so the empty state shows.
       if (opened === false) useLibrary.setState({ hasCompletedInitialLoad: true });

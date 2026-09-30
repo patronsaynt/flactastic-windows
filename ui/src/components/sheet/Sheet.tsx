@@ -1,7 +1,13 @@
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import "./Sheet.css";
+
+const modalStack: object[] = [];
+
+/** True while any sheet is open (app shortcuts stand down). */
+export const isModalOpen = () => modalStack.length > 0;
 
 /**
  * A window-modal sheet: dims the window and slides the panel down from the
@@ -10,16 +16,24 @@ import "./Sheet.css";
 export function Modal({ open, onClose, children }: { open: boolean; onClose: () => void; children: ReactNode }) {
   useEffect(() => {
     if (!open) return;
+    const token = {};
+    modalStack.push(token);
     const k = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      // Only the topmost sheet answers Esc (a cropper over an editor).
+      if (e.key === "Escape" && modalStack.at(-1) === token) {
         e.stopPropagation();
         onClose();
       }
     };
     window.addEventListener("keydown", k);
-    return () => window.removeEventListener("keydown", k);
+    return () => {
+      window.removeEventListener("keydown", k);
+      modalStack.splice(modalStack.indexOf(token), 1);
+    };
   }, [open, onClose]);
-  return (
+  // Portalled so a sheet opened from inside another (transformed) sheet
+  // still covers the window.
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -41,7 +55,9 @@ export function Modal({ open, onClose, children }: { open: boolean; onClose: () 
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    // Inside #root so the UI-scale zoom applies.
+    document.getElementById("root") ?? document.body,
   );
 }
 

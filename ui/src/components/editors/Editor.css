@@ -1,0 +1,85 @@
+/* Shared form pieces for the editor sheets (artist, playlist, metadata). */
+
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+}
+
+.editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.editor-field__label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.editor-field__note {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+/* `.textFieldStyle(.plain)` on a surfaceElevated rounded rect */
+.editor-input {
+  font: inherit;
+  font-size: var(--font-body);
+  color: var(--text-primary);
+  padding: 6px var(--space-sm);
+  border: 0;
+  outline: none;
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.editor-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.editor-input:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.editor-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.editor-row.is-top {
+  align-items: flex-start;
+}
+
+.editor-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.editor-text-button {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.editor-text-button:hover {
+  color: var(--text-secondary);
+}
+
+.editor-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.editor-error {
+  font-size: 11px;
+  color: #e5484d;
+}

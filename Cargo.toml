@@ -8,6 +8,7 @@ members = [
     "crates/fl-conformance",
     "crates/fl-audio",
     "crates/fl-library",
+    "crates/fl-net",
     "app/src-tauri",
 ]
 

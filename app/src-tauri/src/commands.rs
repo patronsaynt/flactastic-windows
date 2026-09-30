@@ -105,13 +105,14 @@ pub fn library_snapshot(st: St) -> LibrarySnapshot {
     let mut l = st.library.write();
     let tracks = l.tracks();
     let albums = l.albums();
+    let resolver = fl_core::ArtistResolver::new(&tracks);
     LibrarySnapshot {
         revision: l.revision(),
         root: root.as_ref().map(|r| r.to_string_lossy().into_owned()),
         scan_state: l.scan_state.clone(),
         has_completed_initial_load: l.has_completed_initial_load,
-        tracks: tracks.iter().map(|t| TrackDto::from_track(t, root.as_deref())).collect(),
-        albums: albums.iter().map(AlbumDto::from_album).collect(),
+        tracks: tracks.iter().map(|t| TrackDto::from_track(t, root.as_deref()).with_links(t, &resolver)).collect(),
+        albums: albums.iter().map(|a| AlbumDto::from_album(a, &resolver)).collect(),
     }
 }
 
@@ -246,4 +247,109 @@ pub fn select_output_bit_depth(st: St, bits: Option<i64>) {
 #[tauri::command]
 pub fn set_exclusive_output(st: St, enabled: bool) {
     st.player.send(Cmd::SetExclusive(enabled && cfg!(windows)));
+}
+
+// MARK: - Artists
+
+use crate::artists::{ArtistDetailDto, ArtistDto, ArtistOverrideDto};
+
+fn library_parts(st: &AppState) -> (Arc<Vec<fl_core::Track>>, Arc<Vec<fl_core::Album>>) {
+    let mut l = st.library.write();
+    (l.tracks(), l.albums())
+}
+
+#[tauri::command]
+pub async fn artists(st: St<'_>) -> Result<Vec<ArtistDto>, String> {
+    let st = st.inner().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let (tracks, albums) = library_parts(&st);
+        st.artists.list(&tracks, &albums, &st.artwork)
+    })
+    .await
+    .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn artist_detail(st: St<'_>, key: String) -> Result<Option<ArtistDetailDto>, String> {
+    let st = st.inner().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let (tracks, albums) = library_parts(&st);
+        st.artists.detail(&key, &tracks, &albums, &st.artwork)
+    })
+    .await
+    .map_err(|e| e.to_string())
+}
+
+/// `artistImageFetcher.ensureImage`, gated on `autoFetchArtistImages`.
+#[tauri::command]
+pub fn ensure_artist_image(st: St, key: String, display_name: String) {
+    if st.settings.lock().auto_fetch_artist_images {
+        st.artists.ensure_image(&key, &display_name);
+    }
+}
+
+#[tauri::command]
+pub fn artist_override(st: St, key: String) -> ArtistOverrideDto {
+    st.artists.override_dto(&key, &st.artwork)
+}
+
+/// Images arrive as artwork ids (from `load_image_file` / `crop_image`).
+#[tauri::command]
+pub fn save_artist_override(
+    app: AppHandle,
+    st: St,
+    key: String,
+    display_name: Option<String>,
+    banner: Option<String>,
+    profile: Option<String>,
+) {
+    let bytes = |id: Option<String>| id.and_then(|id| st.artwork.original(&id)).map(|a| a.to_vec());
+    st.artists.save_override(&key, display_name, bytes(banner), bytes(profile));
+    let _ = app.emit("artists://changed", ());
+}
+
+#[tauri::command]
+pub fn reset_artist_override(app: AppHandle, st: St, key: String) {
+    st.artists.reset_override(&key);
+    let _ = app.emit("artists://changed", ());
+}
+
+// MARK: - Images (cropper)
+
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LoadedImage {
+    id: String,
+    width: u32,
+    height: u32,
+}
+
+/// Reads a picked image file into the artwork store for the cropper.
+#[tauri::command]
+pub async fn load_image_file(st: St<'_>, path: String) -> Result<LoadedImage, String> {
+    let st = st.inner().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let data = std::fs::read(&path).map_err(|e| e.to_string())?;
+        let (width, height) = image::ImageReader::new(std::io::Cursor::new(&data))
+            .with_guessed_format()
+            .map_err(|e| e.to_string())?
+            .into_dimensions()
+            .map_err(|_| "That file isn't an image FLACtastic can read.".to_string())?;
+        Ok(LoadedImage { id: st.artwork.register_bytes("upload", data), width, height })
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+/// `ImageCropperView.commit`: `rect` is `[x, y, w, h]` in source pixels.
+#[tauri::command]
+pub async fn crop_image(st: St<'_>, id: String, rect: [f64; 4], out_width: u32, out_height: u32) -> Result<String, String> {
+    let st = st.inner().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let src = st.artwork.original(&id).ok_or("image expired")?;
+        let png = crate::artists::crop_png(&src, rect, out_width, out_height).ok_or("couldn't crop the image")?;
+        Ok(st.artwork.register_bytes("crop", png))
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }

@@ -1,0 +1,50 @@
+.cropper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xl) var(--space-xl) var(--space-md);
+}
+
+.cropper__window {
+  position: relative;
+  overflow: hidden;
+  background: black;
+  border-radius: var(--radius-md);
+  cursor: grab;
+  touch-action: none;
+}
+
+.cropper__window:active {
+  cursor: grabbing;
+}
+
+.cropper__window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent);
+  pointer-events: none;
+}
+
+.cropper__window img {
+  position: absolute;
+  max-width: none;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.cropper__zoom {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--text-tertiary);
+}
+
+.cropper__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
