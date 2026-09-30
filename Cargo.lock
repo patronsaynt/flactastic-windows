@@ -591,6 +591,7 @@ name = "fl-audio"
 version = "0.1.0"
 dependencies = [
  "cmake",
+ "fastrand",
  "fl-core",
  "flacenc",
  "log",

@@ -13,3 +13,4 @@ so it can be raised on the Mac repo.
 | 5 | Sync | responder | Responder ignores its own per-peer filter. | Fixed. |
 | 6 | Sync | `FileTransfer` | `hashMismatch` is sent after `fileEnd`, which puts the two sides out of step. | Fixed (see SYNC-INTEROP.md for the wire impact). |
 | 7 | Sync | receive path | A content-hash match never adopts the sender's track ID. | Fixed. |
+| 8 | Playback | `PlayerState.updateListeningTracker` | The repeat check ("last position within 2 s of the end, now under 2 s") has no backward-jump test, so on tracks shorter than 2 s it re-records a play on every 50 ms tick. | Fixed: also requires the position to have moved backwards. |

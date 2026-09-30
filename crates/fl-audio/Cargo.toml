@@ -14,6 +14,7 @@ log.workspace = true
 thiserror.workspace = true
 serde.workspace = true
 parking_lot = "0.12"
+fastrand.workspace = true
 rtrb = "0.3"
 realfft = "3"
 symphonia = { version = "0.5.5", default-features = false, features = ["flac", "mp3", "aac", "alac", "isomp4", "wav", "aiff", "pcm"] }

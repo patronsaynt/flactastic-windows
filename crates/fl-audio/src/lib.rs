@@ -4,6 +4,8 @@
 pub mod decode;
 pub mod engine;
 pub mod output;
+pub mod output_manager;
+pub mod player;
 pub mod soxr;
 pub mod spectrum;
 
