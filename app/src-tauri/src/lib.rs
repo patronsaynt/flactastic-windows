@@ -6,6 +6,8 @@ pub mod commands;
 pub mod dto;
 pub mod home;
 pub mod import;
+pub mod lyrics;
+pub mod visualizer;
 pub mod metadata;
 pub mod player_actor;
 pub mod playlists;
@@ -83,6 +85,8 @@ pub fn run() {
             commands::load_image_file,
             commands::crop_image,
             home::home_metrics,
+            lyrics::visualizer_lyrics,
+            visualizer::visualizer_backdrop,
             import::import_load,
             import::import_commit,
             metadata::write_track_metadata,

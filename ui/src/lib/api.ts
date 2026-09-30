@@ -314,6 +314,10 @@ export const api = {
   importCommit: (items: { token: string; edit: TrackEdit | null }[], albumFolder: { artist: string | null; album: string } | null) =>
     invoke<{ trackIds: string[]; error: string | null }>("import_commit", { items, albumFolder }),
 
+  visualizerLyrics: (trackId: string, neighbourIds: string[]) =>
+    invoke<{ state: string; lines?: LyricLine[]; isSynced?: boolean }>("visualizer_lyrics", { trackId, neighbourIds }),
+  visualizerBackdrop: (trackId: string) => invoke<{ key: string; image: string | null }>("visualizer_backdrop", { trackId }),
+
   homeMetrics: (range: string) => invoke<HomeMetrics>("home_metrics", { range }),
   homeHighlight: () => invoke<HomeHighlight | null>("home_highlight"),
   toggleHighlightPin: () => invoke<HomeHighlight | null>("toggle_highlight_pin"),

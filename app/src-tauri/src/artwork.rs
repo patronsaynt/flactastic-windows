@@ -77,6 +77,11 @@ impl ArtworkStore {
         id
     }
 
+    /// Registers bytes under an exact id (derived images such as backdrops).
+    pub fn insert_raw(&self, id: &str, bytes: Vec<u8>) {
+        self.sources.write().insert(id.to_owned(), bytes.into());
+    }
+
     pub fn original(&self, id: &str) -> Option<Artwork> {
         self.sources.read().get(id).cloned()
     }

@@ -48,6 +48,14 @@ export function startPlayerSync(): () => void {
   return on<PlayerSnapshot>("player://state", apply);
 }
 
+/** The interpolated position right now, for animation loops outside React. */
+export function playbackTimeNow(): number {
+  const { currentTime, isPlaying, stampedAt, duration } = usePlayer.getState();
+  if (!isPlaying) return currentTime;
+  const t = currentTime + Math.min(0.25, Math.max(0, (performance.now() - stampedAt) / 1000));
+  return duration ? Math.min(t, duration) : t;
+}
+
 /** Current position, advancing smoothly between backend ticks. */
 export function usePlaybackTime(): number {
   const { currentTime, isPlaying, stampedAt, duration } = usePlayer();

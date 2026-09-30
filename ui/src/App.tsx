@@ -9,6 +9,7 @@ import { startPlaylistsSync } from "./app/playlists";
 import { ConfirmHost } from "./components/sheet/ConfirmDialog";
 import { EditorHost } from "./features/editors/EditorHost";
 import { OnboardingView } from "./features/onboarding/OnboardingView";
+import { VisualizerView } from "./features/visualizer/VisualizerView";
 import { PlaylistsTabView } from "./features/playlists/PlaylistsTabView";
 import { player, startPlayerSync, usePlayer } from "./app/player";
 import { startSettingsSync, useSetting, useSettingsStore } from "./app/settings";
@@ -161,10 +162,12 @@ function Page({ tab }: { tab: AppTab }) {
       return <CollectionView />;
     case "Playlists":
       return <PlaylistsTabView />;
+    case "Visualizer":
+      return <VisualizerView />;
     default:
       return (
         <div className="page-pad">
-          <PageHeader eyebrow={tab === "Visualizer" ? "Now Playing" : "Tools"} title={tab} />
+          <PageHeader eyebrow="Tools" title={tab} />
         </div>
       );
   }

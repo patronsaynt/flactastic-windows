@@ -2,6 +2,7 @@
 //! them on worker threads.
 
 pub mod deezer;
+pub mod lrclib;
 
 use std::sync::OnceLock;
 use std::time::Duration;
