@@ -19,6 +19,7 @@ pub mod presence;
 pub mod rebuild;
 pub mod spotify_auth;
 pub mod state;
+pub mod sync;
 pub mod tray;
 
 use std::sync::Arc;
@@ -60,7 +61,9 @@ pub fn run() {
         .setup(|app| {
             let state = AppState::new(app.handle());
             let lucida_dir = state.dirs.data.join("lucida-webview");
+            let sync_model = sync::SyncModel::new(app.handle().clone(), &state.dirs.data);
             app.manage(state);
+            app.manage(sync_model);
             app.manage(lucida::Lucida::new(app.handle().clone(), lucida_dir));
             app.manage(downloads::Downloads::new(app.handle().clone()));
             app.manage(rebuild::Rebuild::new(app.handle().clone()));
@@ -192,6 +195,20 @@ pub fn run() {
             tray::mini_open_main,
             tray::mini_quit,
             tray::debug_toggle_mini,
+            sync::sync_state,
+            sync::sync_begin,
+            sync::sync_end,
+            sync::sync_open_pairing_code,
+            sync::sync_close_pairing_code,
+            sync::sync_pair,
+            sync::sync_forget,
+            sync::sync_set_direction,
+            sync::sync_start,
+            sync::sync_approve,
+            sync::sync_decline,
+            sync::sync_cancel,
+            sync::sync_dismiss_error,
+            sync::sync_prime_network,
         ])
         .build(tauri::generate_context!())
         .expect("error while building FLACtastic")

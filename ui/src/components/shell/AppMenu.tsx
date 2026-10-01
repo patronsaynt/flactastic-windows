@@ -8,6 +8,7 @@ import { springs } from "../../theme/motion";
 import wordmark from "../../assets/Wordmark.png";
 import { menu, openMenuAt } from "../menu/ContextMenu";
 import { Modal } from "../sheet/Sheet";
+import { openSyncWindow } from "../../features/sync/SyncWindow";
 
 /**
  * The Mac's menu-bar commands (application, File, Collection, Playback
@@ -25,6 +26,8 @@ export function AppMenuButton() {
         menu.button("About FLACtastic", () => setAbout(true)),
         menu.divider,
         menu.button("Refresh Collection", () => void api.refreshLibrary()),
+        menu.divider,
+        menu.button("Sync…", openSyncWindow),
         menu.divider,
         menu.button("Import Track…", () => editors.import("track")),
         menu.button("Import Album…", () => editors.import("album")),

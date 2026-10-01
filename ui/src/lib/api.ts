@@ -395,6 +395,124 @@ export interface SpotifyState {
 
 export const LIKED_SONGS_ID = "__liked_songs__";
 
+// MARK: - Sync (SyncModel)
+
+export type SyncDirection = "push" | "pull";
+export type SyncDeviceKind = "mac" | "iPhone" | "iPad" | "other";
+
+export interface TrackManifestEntry {
+  trackID: string;
+  relativePath: string;
+  fileSize: number;
+  contentHash: string;
+  format: AudioFileFormat;
+  tagFingerprint: string;
+  title: string;
+  artist?: string | null;
+  album?: string | null;
+  albumArtist?: string | null;
+}
+
+export interface PlaylistManifestEntry {
+  id: string;
+  name: string;
+  dateCreated: string;
+  entryCount: number;
+  contentHash: string;
+}
+
+export interface SyncPlan {
+  direction: SyncDirection;
+  newTracks: TrackManifestEntry[];
+  trackConflicts: { incoming: TrackManifestEntry; existing: TrackManifestEntry; differingFields: string[] }[];
+  newPlaylists: PlaylistManifestEntry[];
+  playlistConflicts: { incoming: PlaylistManifestEntry; existing: PlaylistManifestEntry }[];
+}
+
+export interface PickTrack {
+  entry: TrackManifestEntry;
+  replaces: string | null;
+  creditedArtist: string | null;
+}
+
+export interface PickAlbum {
+  id: string;
+  title: string;
+  tracks: PickTrack[];
+  trackIDs: string[];
+  bytes: number;
+}
+
+export interface PickArtist {
+  id: string;
+  name: string;
+  albums: PickAlbum[];
+  trackIDs: string[];
+  bytes: number;
+}
+
+export interface PickList {
+  artists: PickArtist[];
+  playlists: { entry: PlaylistManifestEntry; replacesExisting: boolean }[];
+}
+
+export interface SyncProgress {
+  completedFiles: number;
+  totalFiles: number;
+  bytesTransferred: number;
+  totalBytes: number;
+  currentFileName: string | null;
+}
+
+export interface SyncSummary {
+  tracksTransferred: number;
+  playlistsTransferred: number;
+  bytesTransferred: number;
+  skipped: number;
+  failures: string[];
+}
+
+export type SyncPhase =
+  | { kind: "idle" }
+  | { kind: "preparing"; fraction: number }
+  | { kind: "awaitingApproval"; plan: SyncPlan; planHash: string; totalBytes: number; overwriteCount: number; pickList: PickList }
+  | { kind: "transferring"; progress: SyncProgress }
+  | { kind: "finished"; summary: SyncSummary }
+  | { kind: "failed"; message: string };
+
+export interface SyncPeerRow {
+  deviceID: string;
+  displayName: string;
+  kind: SyncDeviceKind;
+  isPaired: boolean;
+  isCompatible: boolean;
+  isPairingOpen: boolean;
+  /** Unix seconds. */
+  lastSyncedAt: number | null;
+}
+
+export interface SyncState {
+  displayName: string;
+  isAdvertising: boolean;
+  isBrowsing: boolean;
+  listenerError: string | null;
+  pairingCode: string | null;
+  lockoutSeconds: number;
+  rows: SyncPeerRow[];
+  offlinePeers: SyncPeerRow[];
+  phase: SyncPhase;
+  activePeerID: string | null;
+  pairingPeerID: string | null;
+  errorMessage: string | null;
+  direction: SyncDirection;
+  hasLibrary: boolean;
+}
+
+export interface SyncSelection {
+  trackIDs?: string[];
+  playlistIDs?: string[];
+}
+
 /** Settings are the Mac's `flactastic.*` UserDefaults keys, verbatim. */
 export type SettingsMap = Record<string, unknown>;
 
@@ -512,6 +630,20 @@ export const api = {
   spotifyLoadPlaylists: () => invoke<void>("spotify_load_playlists"),
   spotifyResolvePlaylist: (url: string, authed: boolean, liked = false) =>
     invoke<{ playlist: RemotePlaylist; wasTruncated: boolean }>("spotify_resolve_playlist", { url, authed, liked }),
+  syncState: () => invoke<SyncState>("sync_state"),
+  syncBegin: () => invoke<void>("sync_begin"),
+  syncEnd: () => invoke<void>("sync_end"),
+  syncOpenPairingCode: () => invoke<void>("sync_open_pairing_code"),
+  syncClosePairingCode: () => invoke<void>("sync_close_pairing_code"),
+  syncPair: (deviceId: string, code: string) => invoke<void>("sync_pair", { deviceId, code }),
+  syncForget: (deviceId: string) => invoke<void>("sync_forget", { deviceId }),
+  syncSetDirection: (direction: SyncDirection) => invoke<void>("sync_set_direction", { direction }),
+  syncStart: (deviceId: string) => invoke<void>("sync_start", { deviceId }),
+  syncApprove: (selection: SyncSelection) => invoke<void>("sync_approve", { selection }),
+  syncDecline: () => invoke<void>("sync_decline"),
+  syncCancel: () => invoke<void>("sync_cancel"),
+  syncDismissError: () => invoke<void>("sync_dismiss_error"),
+  syncPrimeNetwork: () => invoke<void>("sync_prime_network"),
 };
 
 export function on<T>(event: string, cb: (payload: T) => void): () => void {

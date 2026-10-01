@@ -10,6 +10,7 @@ import { startDownloadsSync } from "./app/downloads";
 import { DownloadView } from "./features/download/DownloadView";
 import { LucidaChallengeHost } from "./features/download/LucidaChallenge";
 import { LucidaDebugPanel } from "./features/download/LucidaDebug";
+import { SyncWindowHost } from "./features/sync/SyncWindow";
 import { ConfirmHost } from "./components/sheet/ConfirmDialog";
 import { EditorHost } from "./features/editors/EditorHost";
 import { OnboardingView } from "./features/onboarding/OnboardingView";
@@ -71,6 +72,10 @@ export function App() {
   useEffect(() => {
     if (!settingsLoaded) return;
     requestAnimationFrame(() => void api.appReady());
+    // First run: raise the OS firewall prompt for sync now (once), not
+    // mid-pairing later.
+    const t = setTimeout(() => void api.syncPrimeNetwork(), 1500);
+    return () => clearTimeout(t);
   }, [settingsLoaded]);
 
   // The Download tab vanished from the bar: don't strand the user on it.
@@ -155,6 +160,7 @@ export function App() {
       <EditorHost />
       <LucidaChallengeHost />
       <LucidaDebugPanel />
+      <SyncWindowHost />
       <ConfirmHost />
       <ContextMenuHost />
     </div>

@@ -22,6 +22,10 @@ fl-audio = { path = "../../crates/fl-audio" }
 fl-library = { path = "../../crates/fl-library" }
 fl-platform = { path = "../../crates/fl-platform" }
 fl-net = { path = "../../crates/fl-net" }
+fl-sync = { path = "../../crates/fl-sync" }
+mdns-sd = "0.13"
+openssl = { version = "0.10", features = ["vendored"] }
+tokio = { version = "1", features = ["sync", "net", "time", "rt", "macros"] }
 tauri = { version = "2", features = ["tray-icon", "image-png"] }
 tauri-plugin-dialog = "2"
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }

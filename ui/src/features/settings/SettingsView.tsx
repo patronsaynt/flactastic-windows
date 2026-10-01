@@ -3,6 +3,9 @@ import { AArrowDown, AArrowUp, Folder, FolderOpen, Speaker, X } from "lucide-rea
 import { useEffect, useState } from "react";
 import { useLibrary } from "../../app/library";
 import { useDebug, useDownloads } from "../../app/downloads";
+import { useSyncSession } from "../../app/sync";
+import { SyncContent } from "../sync/SyncContent";
+import { openSyncWindow } from "../sync/SyncWindow";
 import { setSetting, useSettingsStore } from "../../app/settings";
 import { api, on, type OutputStatus } from "../../lib/api";
 import { platform } from "../../lib/native";
@@ -317,13 +320,14 @@ function ConnectionsPane() {
 // MARK: - Devices (library sync)
 
 function DevicesPane() {
+  useSyncSession();
   return (
     <div className="pane">
-      <SettingsGroup title="This Device">
-        <div className="settings-row">
-          <RowLabel label="Library Sync" subtitle="Pair and sync with FLACtastic on your Mac, iPhone or other computers on this network." />
-        </div>
-      </SettingsGroup>
+      <SyncContent />
+      <div className="sync-devices-footer">
+        <span className="sync-caption">Devices are only discoverable while this tab or the Sync window is open.</span>
+        <PillButton onClick={openSyncWindow}>Open Sync Window</PillButton>
+      </div>
     </div>
   );
 }
