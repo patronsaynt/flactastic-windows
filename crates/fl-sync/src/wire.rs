@@ -122,11 +122,32 @@ pub struct PairResult {
     pub failure_reason: Option<String>,
 }
 
-/// Placeholders until the manifest/plan types land (Phase 5); kept as raw
-/// JSON so every message still round-trips.
-pub type SyncRequest = serde_json::Value;
-pub type PlanProposal = serde_json::Value;
-pub type PlanDecision = serde_json::Value;
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SyncRequest {
+    /// As the *initiating* device means it; the responder inverts it.
+    pub direction: crate::protocol::Direction,
+    pub filter: crate::manifest::SyncFilter,
+    pub manifest: crate::manifest::LibraryManifest,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlanProposal {
+    pub plan: crate::manifest::SyncPlan,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub receiver_free_bytes: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlanDecision {
+    /// The full plan's hash; the receiver refuses if its own differs.
+    pub plan_hash: String,
+    pub approved: bool,
+    /// What the user ticked; `None` means all of it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub selection: Option<crate::manifest::SyncSelection>,
+}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

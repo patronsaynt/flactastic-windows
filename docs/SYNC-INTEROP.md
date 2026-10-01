@@ -21,8 +21,13 @@ has a test in `crates/fl-sync` or `crates/fl-core`.
 | `deviceKind` in `Hello`/`PairConfirm` is a closed enum on the Mac: sending anything but `mac/iPhone/iPad/other` makes the Mac reject the message | `SyncDeviceKind` | Desktop sends `other` everywhere | — |
 | TXT `k` unknown → `other` on decode (safe), `v` must be `major.minor` digits | `TXTRecordCodec.swift` | `fl_sync::txt` | `round_trip_and_unknown_kind` |
 
-`planHash` group ordering, playlist hash, `tagFingerprint` and the rest of
-the manifest rules land with Phase 5.
+| `tagFingerprint`: NFC + trimmed fields in a fixed order joined by U+001F, secondary genres sorted, `mix` appended only when true | `ContentHasher.swift` (`TagFingerprint`) | `fl_sync::manifest::tag_fingerprint` | `fingerprint_matches_the_mac_golden_value` (the Mac's pinned digest) |
+| `planHash`: direction, then `n:`/`c:`/`p:`/`q:` groups, each sorted, joined by `
+`, SHA-256 hex | `Manifest.swift` (`SyncPlan.planHash`) | `SyncPlan::plan_hash` | `plan_hash_and_restriction` |
+| Playlist hash: `name
+` + `trackID-or-"-"\|relativePath` lines (entry UUIDs excluded) | `ManifestBuilder.contentHash(for:)` | `manifest::playlist_content_hash` | `playlist_hash_uses_name_and_ordered_entries` |
+| `sync-hashes.json` sidecar: `{relPath: {contentHash, fileSize, mtime}}`, `mtime` as seconds since 2001, valid within 1 ms | `ContentHashCache.swift` | `fl_sync::builder::ContentHashCache` | `cache_validity_and_sidecar_format` |
+| Incoming files land in `.flactastic/incoming/<ID>.part`; the `.part` length is the resume offset | `FileTransfer.swift` | `fl_sync::transfer` | `an_interrupted_transfer_resumes_from_the_part_file` |
 
 ## TLS (Spike A)
 
@@ -79,6 +84,19 @@ port shows the ClientHello (`supported_versions`, `psk_key_exchange_modes`,
 ## Desktop fixes to Mac behaviour (local-only, no wire change)
 
 See `docs/MAC-ISSUES.md` rows 5–7. Where a fix would change what goes on the
-wire (e.g. the order of `hashMismatch` and `fileEnd`) the desktop keeps the
-Mac's wire behaviour and only fixes its own state handling; the details are
-recorded here when Phase 5 lands.
+wire the desktop keeps the Mac's wire behaviour and only fixes its own state
+handling.
+
+**Row 6 (`hashMismatch` after `fileEnd`).** A Mac receiver sends
+`protocolError(hashMismatch)` after the sender's `fileEnd`, where the sender
+reads it as the reply to its *next* `fileStart`; from then on the two sides
+are out of step.
+
+- Desktop as **receiver**: records the failure and sends nothing. The sender
+  (Mac or desktop) was never going to read a reply there, so both stay in
+  step. This only omits a message; nothing new goes on the wire.
+- Desktop as **sender**: a `hashMismatch` arriving where `fileAccept` is
+  expected is charged to the previous file (moved from "transferred" to
+  "failures") and the next message is read as the real `fileAccept`. After
+  `syncComplete` it waits up to 750 ms for a trailing `hashMismatch` about the
+  last file. Test: `sender_charges_a_late_hash_mismatch_to_the_previous_file`.
