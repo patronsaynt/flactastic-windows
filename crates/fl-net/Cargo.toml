@@ -14,3 +14,7 @@ serde_json.workspace = true
 thiserror.workspace = true
 log.workspace = true
 ureq = { version = "3", features = ["json"] }
+parking_lot = "0.12"
+base64.workspace = true
+sha2 = "0.10"
+getrandom = "0.3"

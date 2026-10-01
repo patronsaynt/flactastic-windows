@@ -33,6 +33,8 @@ const defaults = {
   "flactastic.hasCompletedOnboarding": false,
   "flactastic.groupByArtist": false,
   "flactastic.showDownloadTab": false,
+  "flactastic.showVpnNotice": true,
+  "flactastic.showSpotifyLikedSongs": true,
   "flactastic.showMenuBarPlayer": true,
   "flactastic.volume": 0.75,
   "flactastic.collectionSort": "Album",

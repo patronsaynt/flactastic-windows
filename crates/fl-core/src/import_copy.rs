@@ -37,6 +37,28 @@ pub fn sanitize(name: &str, fallback: &str) -> String {
     cleaned
 }
 
+/// `DownloadCoordinator.sanitize`: `/` and `:` become `-`, `Untitled` when
+/// empty, `_` before a leading dot. Added for Windows: the other invalid
+/// characters and control characters are dropped, trailing dots/spaces
+/// trimmed, and reserved device names prefixed with `_`.
+pub fn sanitize_download_component(raw: &str) -> String {
+    const DROP: [char; 7] = ['\\', '*', '?', '"', '<', '>', '|'];
+    let replaced: String = raw
+        .chars()
+        .map(|c| if c == '/' || c == ':' { '-' } else { c })
+        .filter(|c| !DROP.contains(c) && !c.is_control())
+        .collect();
+    let trimmed = trim(&replaced).trim_end_matches(['.', ' ']);
+    let mut out = trim(trimmed).to_owned();
+    if out.is_empty() {
+        return "Untitled".into();
+    }
+    if out.starts_with('.') || is_reserved_windows_name(&out) {
+        out.insert(0, '_');
+    }
+    out
+}
+
 /// `[artist] - [album title]`.
 pub fn album_folder_name(artist: Option<&str>, album: &str) -> String {
     let a = sanitize(artist.map(str::trim).unwrap_or(""), "Unknown Artist");
@@ -129,6 +151,15 @@ mod tests {
         assert_eq!(sanitize("Console", "x"), "Console");
         assert_eq!(sanitize("Mr. ", "x"), "Mr");
         assert_eq!(sanitize("tab\there", "x"), "tabhere");
+    }
+
+    #[test]
+    fn download_component_rules() {
+        assert_eq!(sanitize_download_component("AC/DC: Live?"), "AC-DC- Live");
+        assert_eq!(sanitize_download_component("  "), "Untitled");
+        assert_eq!(sanitize_download_component(".x"), "_.x");
+        assert_eq!(sanitize_download_component("aux"), "_aux");
+        assert_eq!(sanitize_download_component("Vol. 2..."), "Vol. 2");
     }
 
     #[test]

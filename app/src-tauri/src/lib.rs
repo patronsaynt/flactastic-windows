@@ -4,14 +4,18 @@ pub mod artists;
 mod artwork;
 pub mod commands;
 pub mod dto;
+pub mod downloads;
 pub mod home;
 pub mod import;
+pub mod lucida;
 pub mod lyrics;
 pub mod organizer;
 pub mod visualizer;
 pub mod metadata;
 pub mod player_actor;
 pub mod playlists;
+pub mod rebuild;
+pub mod spotify_auth;
 pub mod state;
 
 use std::sync::Arc;
@@ -24,13 +28,20 @@ pub fn run() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+            // A second launch carrying a flactastic:// link (Spotify login).
+            if let Some(auth) = app.try_state::<Arc<spotify_auth::SpotifyAuth>>() {
+                for a in &args {
+                    auth.handle_url(a);
+                }
+            }
             if let Some(w) = app.get_webview_window("main") {
                 let _ = w.unminimize();
                 let _ = w.show();
                 let _ = w.set_focus();
             }
         }))
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_dialog::init())
         .register_uri_scheme_protocol("flart", |ctx, req| {
             let st = ctx.app_handle().state::<Arc<AppState>>();
@@ -45,7 +56,32 @@ pub fn run() {
         })
         .setup(|app| {
             let state = AppState::new(app.handle());
+            let lucida_dir = state.dirs.data.join("lucida-webview");
             app.manage(state);
+            app.manage(lucida::Lucida::new(app.handle().clone(), lucida_dir));
+            app.manage(downloads::Downloads::new(app.handle().clone()));
+            app.manage(rebuild::Rebuild::new(app.handle().clone()));
+            let auth = spotify_auth::SpotifyAuth::new(app.handle().clone());
+            app.manage(auth.clone());
+            {
+                use tauri_plugin_deep_link::DeepLinkExt;
+                let a = auth.clone();
+                app.deep_link().on_open_url(move |e| {
+                    for u in e.urls() {
+                        a.handle_url(u.as_str());
+                    }
+                });
+            }
+            auth.restore();
+            // The hidden Lucida window must not keep the app alive.
+            if let Some(main) = app.get_webview_window("main") {
+                let handle = app.handle().clone();
+                main.on_window_event(move |e| {
+                    if let tauri::WindowEvent::Destroyed = e {
+                        handle.exit(0);
+                    }
+                });
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -120,6 +156,33 @@ pub fn run() {
             playlists::move_playlist_entry,
             playlists::record_playlist_play,
             playlists::record_album_play,
+            lucida::lucida_state,
+            lucida::lucida_log,
+            lucida::lucida_clear_log,
+            lucida::lucida_warm_up,
+            lucida::lucida_reload,
+            lucida::lucida_clear_site_data,
+            lucida::lucida_show_webview,
+            lucida::lucida_reveal_challenge,
+            lucida::lucida_dismiss_challenge,
+            lucida::download_resolve,
+            lucida::lucida_debug_eval,
+            downloads::download_jobs,
+            downloads::download_enqueue,
+            downloads::download_cancel,
+            downloads::download_cancel_all,
+            downloads::download_clear_completed,
+            downloads::remote_artwork,
+            rebuild::rebuild_state,
+            rebuild::rebuild_start,
+            rebuild::rebuild_cancel,
+            rebuild::rebuild_dismiss,
+            spotify_auth::spotify_state,
+            spotify_auth::spotify_connect,
+            spotify_auth::spotify_cancel_connect,
+            spotify_auth::spotify_disconnect,
+            spotify_auth::spotify_load_playlists,
+            spotify_auth::spotify_resolve_playlist,
         ])
         .build(tauri::generate_context!())
         .expect("error while building FLACtastic")

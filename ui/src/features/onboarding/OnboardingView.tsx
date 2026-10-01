@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Check, CheckCircle2, ChevronLeft, FolderPlus, ListMusic } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { setSetting, useSetting, useSettingsStore } from "../../app/settings";
+import { useDownloads } from "../../app/downloads";
 import { api } from "../../lib/api";
 import wordmark from "../../assets/Wordmark.png";
 import { RiseFadeIn } from "../../components/RiseFadeIn";
@@ -211,12 +212,9 @@ function LibraryPage({ onNext }: { onNext: () => void }) {
   );
 }
 
-/**
- * Spotify connect is part of the Download/Connections work that hasn't
- * landed on this platform yet, so the row stays "Not connected" and the
- * connect button is disabled; Skip continues as on the Mac.
- */
+/** `OnboardingSpotifyPage`: optional Spotify connect (login in the browser). */
 function SpotifyPage({ onNext }: { onNext: () => void }) {
+  const connection = useDownloads((s) => s.spotify.connection);
   return (
     <Page gap="var(--space-lg)" pad="var(--space-sm)">
       <RiseFadeIn delay={0}>
@@ -234,17 +232,36 @@ function SpotifyPage({ onNext }: { onNext: () => void }) {
           </span>
           <span className="linked-card__text">
             <span className="linked-card__title">Spotify</span>
-            <span className="onboarding__caption">Not connected</span>
+            {connection.kind === "connected" ? (
+              <span className="onboarding__caption" style={{ color: "var(--quality-cd)" }}>
+                Connected as {connection.displayName}
+              </span>
+            ) : (
+              <span className="onboarding__caption">{connection.kind === "connecting" ? "Connecting…" : "Not connected"}</span>
+            )}
           </span>
+          <span style={{ flex: 1 }} />
+          {connection.kind === "connecting" && <span className="dl-spinner is-small" />}
+          {connection.kind === "connected" && (
+            <span className="service-row__check">
+              <Check size={10} strokeWidth={4} />
+            </span>
+          )}
         </div>
       </RiseFadeIn>
       <RiseFadeIn delay={0.1} className="onboarding__actions">
         <button className="onboarding__skip" onClick={onNext}>
           Skip for now
         </button>
-        <PillButton primary onClick={() => {}} disabled>
-          Connect Spotify
-        </PillButton>
+        {connection.kind === "connected" ? (
+          <PillButton primary onClick={onNext}>
+            Continue
+          </PillButton>
+        ) : (
+          <PillButton primary onClick={() => void api.spotifyConnect().catch(() => {})} disabled={connection.kind === "connecting"}>
+            {connection.kind === "connecting" ? "Connecting…" : "Connect Spotify"}
+          </PillButton>
+        )}
       </RiseFadeIn>
     </Page>
   );
@@ -254,6 +271,7 @@ function DonePage({ onFinish }: { onFinish: () => void }) {
   const light = useSetting("flactastic.useLightMode");
   const path = useSettingsStore((s) => (s.raw["flactastic.lastRootPath"] as string | undefined) ?? null);
   const short = path ? (path.split(/[\\/]/).filter(Boolean).pop() ?? path) : "—";
+  const spotifyConnected = useDownloads((s) => s.spotify.connection.kind === "connected");
   return (
     <Page gap="var(--space-lg)" pad="var(--space-sm)">
       <RiseFadeIn delay={0}>
@@ -272,7 +290,7 @@ function DonePage({ onFinish }: { onFinish: () => void }) {
       <RiseFadeIn delay={0.12} className="summary">
         <SummaryRow label="Appearance" value={light ? "Light" : "Dark"} />
         <SummaryRow label="Library" value={short} />
-        <SummaryRow label="Spotify" value="Not connected" />
+        <SummaryRow label="Spotify" value={spotifyConnected ? "Connected" : "Not connected"} />
       </RiseFadeIn>
       <RiseFadeIn delay={0.16} style={{ paddingTop: "var(--space-xs)" }}>
         <PillButton primary onClick={onFinish}>

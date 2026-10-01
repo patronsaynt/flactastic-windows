@@ -252,6 +252,149 @@ export interface OutputStatus {
   backend: string;
 }
 
+// MARK: - Downloads (StreamerModels, DownloadCoordinator, Lucida, Spotify)
+
+export interface RemoteArtist {
+  id: string;
+  name: string;
+  url?: string | null;
+  pictureUrl?: string | null;
+}
+
+export interface RemoteCoverArt {
+  url: string;
+  width?: number | null;
+  height?: number | null;
+}
+
+export interface RemoteAlbumRef {
+  id: string;
+  title: string;
+  url?: string | null;
+  coverArt: RemoteCoverArt[];
+  releaseYear?: number | null;
+  trackCount?: number | null;
+}
+
+export interface RemoteTrack {
+  id: string;
+  title: string;
+  artists: RemoteArtist[];
+  album?: RemoteAlbumRef | null;
+  trackNumber?: number | null;
+  discNumber?: number | null;
+  durationSeconds?: number | null;
+  coverArt: RemoteCoverArt[];
+  url?: string | null;
+  serviceId: string;
+  isLossless: boolean;
+}
+
+export interface RemoteAlbum {
+  id: string;
+  title: string;
+  artists: RemoteArtist[];
+  releaseYear: number | null;
+  coverArt: RemoteCoverArt[];
+  url: string | null;
+  trackCount: number | null;
+  tracks: RemoteTrack[];
+  serviceId: string;
+}
+
+export interface RemotePlaylist {
+  id: string;
+  title: string;
+  creator: string | null;
+  coverArt: RemoteCoverArt[];
+  url: string | null;
+  tracks: RemoteTrack[];
+  serviceId: string;
+}
+
+export type RemoteResolve =
+  | { kind: "track"; track: RemoteTrack }
+  | { kind: "album"; album: RemoteAlbum }
+  | { kind: "playlist"; playlist: RemotePlaylist }
+  | { kind: "artist"; artist: RemoteArtist; topTracks: RemoteTrack[]; albums: RemoteAlbum[] };
+
+export type LucidaFormat = "original" | "flac" | "mp3" | "ogg-vorbis" | "opus" | "m4a-aac" | "wav" | "bitcrush";
+
+export interface LucidaOptions {
+  region: string;
+  addMetadata: boolean;
+  compatibility: boolean;
+  format: LucidaFormat;
+  quality: string | null;
+}
+
+export type JobStatus =
+  | { kind: "queued" }
+  | { kind: "downloading"; receivedBytes: number; totalBytes: number | null }
+  | { kind: "tagging" }
+  | { kind: "finishing" }
+  | { kind: "completed"; path: string }
+  | { kind: "failed"; message: string }
+  | { kind: "cancelled" }
+  | { kind: "skipped"; path: string };
+
+export interface DownloadJob {
+  id: string;
+  track: RemoteTrack;
+  status: JobStatus;
+  trustEmbeddedMetadata: boolean;
+}
+
+export type LucidaPhase = { kind: "idle" } | { kind: "loading" } | { kind: "ready" } | { kind: "failed"; message: string };
+
+export interface LucidaState {
+  phase: LucidaPhase;
+  needsUserChallenge: boolean;
+}
+
+export interface LucidaLogEntry {
+  id: number;
+  timestamp: number;
+  kind: "nav" | "bridge" | "ok" | "error" | "info";
+  message: string;
+}
+
+export interface RebuildSummary {
+  playlistName: string;
+  total: number;
+  downloaded: number;
+  reused: { index: number; title: string; artist: string }[];
+  failures: { index: number; title: string; artist: string; reason: string }[];
+  alreadyInPlaylist: number;
+  isResume: boolean;
+}
+
+export type RebuildPhase =
+  | { kind: "idle" }
+  | { kind: "fetchingArtwork" }
+  | { kind: "running"; current: number; total: number }
+  | { kind: "finished"; summary: RebuildSummary };
+
+export interface SpotifyPlaylistSummary {
+  id: string;
+  name: string;
+  owner: string | null;
+  /** -1 for the synthetic Liked Songs card. */
+  trackCount: number;
+  coverArtUrl: string | null;
+  externalUrl: string;
+}
+
+export type SpotifyConnection = { kind: "disconnected" } | { kind: "connecting" } | { kind: "connected"; displayName: string };
+
+export interface SpotifyState {
+  connection: SpotifyConnection;
+  playlists: SpotifyPlaylistSummary[];
+  playlistsError: string | null;
+}
+
+export const LIKED_SONGS_ID = "__liked_songs__";
+
 /** Settings are the Mac's `flactastic.*` UserDefaults keys, verbatim. */
 export type SettingsMap = Record<string, unknown>;
 
@@ -339,6 +482,36 @@ export const api = {
 
   cropImage: (id: string, rect: [number, number, number, number], outWidth: number, outHeight: number) =>
     invoke<string>("crop_image", { id, rect, outWidth, outHeight }),
+  downloadResolve: (url: string) => invoke<RemoteResolve>("download_resolve", { url }),
+  downloadJobs: () => invoke<DownloadJob[]>("download_jobs"),
+  downloadEnqueue: (tracks: RemoteTrack[], options: LucidaOptions) => invoke<void>("download_enqueue", { tracks, options }),
+  downloadCancel: (id: string) => invoke<void>("download_cancel", { id }),
+  downloadCancelAll: () => invoke<void>("download_cancel_all"),
+  downloadClearCompleted: () => invoke<void>("download_clear_completed"),
+  remoteArtwork: (url: string) => invoke<{ id: string; accent: [number, number, number] | null }>("remote_artwork", { url }),
+
+  lucidaState: () => invoke<LucidaState>("lucida_state"),
+  lucidaLog: () => invoke<LucidaLogEntry[]>("lucida_log"),
+  lucidaClearLog: () => invoke<void>("lucida_clear_log"),
+  lucidaWarmUp: () => invoke<void>("lucida_warm_up"),
+  lucidaReload: () => invoke<void>("lucida_reload"),
+  lucidaClearSiteData: () => invoke<void>("lucida_clear_site_data"),
+  lucidaShowWebview: () => invoke<void>("lucida_show_webview"),
+  lucidaRevealChallenge: () => invoke<void>("lucida_reveal_challenge"),
+  lucidaDismissChallenge: () => invoke<void>("lucida_dismiss_challenge"),
+
+  rebuildState: () => invoke<RebuildPhase>("rebuild_state"),
+  rebuildStart: (playlist: RemotePlaylist, options: LucidaOptions) => invoke<void>("rebuild_start", { playlist, options }),
+  rebuildCancel: () => invoke<void>("rebuild_cancel"),
+  rebuildDismiss: () => invoke<void>("rebuild_dismiss"),
+
+  spotifyState: () => invoke<SpotifyState>("spotify_state"),
+  spotifyConnect: () => invoke<void>("spotify_connect"),
+  spotifyCancelConnect: () => invoke<void>("spotify_cancel_connect"),
+  spotifyDisconnect: () => invoke<void>("spotify_disconnect"),
+  spotifyLoadPlaylists: () => invoke<void>("spotify_load_playlists"),
+  spotifyResolvePlaylist: (url: string, authed: boolean, liked = false) =>
+    invoke<{ playlist: RemotePlaylist; wasTruncated: boolean }>("spotify_resolve_playlist", { url, authed, liked }),
 };
 
 export function on<T>(event: string, cb: (payload: T) => void): () => void {

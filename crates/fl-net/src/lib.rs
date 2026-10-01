@@ -3,6 +3,10 @@
 
 pub mod deezer;
 pub mod lrclib;
+pub mod lucida;
+pub mod odesli;
+pub mod remote;
+pub mod spotify;
 
 use std::sync::OnceLock;
 use std::time::Duration;

@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { AArrowDown, AArrowUp, Folder, FolderOpen, Speaker, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLibrary } from "../../app/library";
+import { useDebug, useDownloads } from "../../app/downloads";
 import { setSetting, useSettingsStore } from "../../app/settings";
 import { api, on, type OutputStatus } from "../../lib/api";
 import { platform } from "../../lib/native";
@@ -71,6 +72,8 @@ function GeneralPane() {
   const [showDownload, setShowDownload] = useKey("flactastic.showDownloadTab", false);
   const [menuBar, setMenuBar] = useKey("flactastic.showMenuBarPlayer", true);
   const [artistImages, setArtistImages] = useKey("flactastic.autoFetchArtistImages", true);
+  const [vpn, setVpn] = useKey("flactastic.showVpnNotice", true);
+  const debugMode = useDebug((s) => s.lucidaDebugEnabled);
   return (
     <div className="pane">
       <SettingsGroup title="Library">
@@ -103,6 +106,16 @@ function GeneralPane() {
       <SettingsGroup title="Statistics">
         <CountedPlayThreshold />
       </SettingsGroup>
+      {debugMode && (
+        <SettingsGroup title="Debug">
+          <ToggleRow
+            label="Show VPN Advisory"
+            subtitle="Show a reminder to use a VPN when opening the Downloads tab."
+            on={vpn}
+            onChange={setVpn}
+          />
+        </SettingsGroup>
+      )}
     </div>
   );
 }
@@ -251,19 +264,44 @@ function AudioPane() {
 function ConnectionsPane() {
   const [discord, setDiscord] = useKey("flactastic.discordRichPresenceEnabled", true);
   const [liked, setLiked] = useKey("flactastic.showSpotifyLikedSongs", true);
+  const connection = useDownloads((s) => s.spotify.connection);
   return (
     <div className="pane">
       <SettingsGroup title="Social">
         <ToggleRow label="Discord Rich Presence" subtitle="Show the currently playing track in your Discord status." on={discord} onChange={setDiscord} />
       </SettingsGroup>
       <SettingsGroup title="Spotify Account">
-        <div className="settings-row" style={{ flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+        <div className="settings-row" style={{ flexDirection: "column", alignItems: "stretch", gap: 12 }}>
           <div className="settings-row__subtitle">
             Connect your Spotify account to browse and download your own playlists, including private ones, in full.
           </div>
-          <PillButton primary onClick={() => {}}>
-            Connect Spotify
-          </PillButton>
+          <div className="spotify-account">
+            {connection.kind === "disconnected" && (
+              <PillButton primary onClick={() => void api.spotifyConnect().catch(() => {})}>
+                Connect Spotify
+              </PillButton>
+            )}
+            {connection.kind === "connecting" && (
+              <>
+                <span className="dl-spinner is-small" />
+                <span className="spotify-account__status">Connecting…</span>
+                <span className="spotify-account__spacer" />
+                <PillButton muted onClick={() => void api.spotifyCancelConnect()}>
+                  Cancel
+                </PillButton>
+              </>
+            )}
+            {connection.kind === "connected" && (
+              <>
+                <span className="spotify-account__dot" />
+                <span className="spotify-account__status">
+                  Connected as <b>{connection.displayName}</b>
+                </span>
+                <span className="spotify-account__spacer" />
+                <PillButton onClick={() => void api.spotifyDisconnect()}>Disconnect</PillButton>
+              </>
+            )}
+          </div>
         </div>
         <ToggleRow
           label="Show Liked Songs"
@@ -382,14 +420,18 @@ function VisualizerPane() {
 // MARK: - Debug
 
 function DebugPane() {
+  const lucidaDebug = useDebug((s) => s.lucidaDebugEnabled);
   return (
     <div className="pane">
       <SettingsGroup title="Developer Tools">
         <ToggleRow
           label="Debug Lucida"
           subtitle="Open the Lucida bridge inspector — live phase, web view, and navigation/bridge log."
-          on={false}
-          onChange={() => {}}
+          on={lucidaDebug}
+          onChange={(v) => {
+            useDebug.setState({ lucidaDebugEnabled: v });
+            if (v) void api.lucidaWarmUp();
+          }}
         />
         <GroupDivider />
         <div className="settings-row is-top">

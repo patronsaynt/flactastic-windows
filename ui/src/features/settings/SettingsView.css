@@ -135,3 +135,29 @@
   background: white;
   box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.2);
 }
+
+.spotify-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.spotify-account__status {
+  color: var(--text-secondary);
+}
+
+.spotify-account__status b {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.spotify-account__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--quality-cd);
+}
+
+.spotify-account__spacer {
+  flex: 1;
+}

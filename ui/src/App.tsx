@@ -6,6 +6,10 @@ import { SettingsView } from "./features/settings/SettingsView";
 import { startLibrarySync, useLibrary } from "./app/library";
 import { startArtistsSync } from "./app/artists";
 import { startPlaylistsSync } from "./app/playlists";
+import { startDownloadsSync } from "./app/downloads";
+import { DownloadView } from "./features/download/DownloadView";
+import { LucidaChallengeHost } from "./features/download/LucidaChallenge";
+import { LucidaDebugPanel } from "./features/download/LucidaDebug";
 import { ConfirmHost } from "./components/sheet/ConfirmDialog";
 import { EditorHost } from "./features/editors/EditorHost";
 import { OnboardingView } from "./features/onboarding/OnboardingView";
@@ -46,7 +50,7 @@ export function App() {
   const closeSettings = useCallback(() => useUI.getState().setShowSettings(false), []);
 
   useEffect(() => {
-    const stops = [startSettingsSync(), startLibrarySync(), startPlayerSync(), startArtistsSync(), startPlaylistsSync()];
+    const stops = [startSettingsSync(), startLibrarySync(), startPlayerSync(), startArtistsSync(), startPlaylistsSync(), startDownloadsSync()];
     void api.bootstrapLibrary().then((opened) => {
       // Nothing to scan: reveal the UI at once so the empty state shows.
       if (opened === false) useLibrary.setState({ hasCompletedInitialLoad: true });
@@ -149,6 +153,8 @@ export function App() {
         <SettingsView onClose={closeSettings} />
       </Modal>
       <EditorHost />
+      <LucidaChallengeHost />
+      <LucidaDebugPanel />
       <ConfirmHost />
       <ContextMenuHost />
     </div>
@@ -167,6 +173,8 @@ function Page({ tab }: { tab: AppTab }) {
       return <VisualizerView />;
     case "Organizer":
       return <OrganizerView />;
+    case "Download":
+      return <DownloadView />;
     default:
       return (
         <div className="page-pad">
