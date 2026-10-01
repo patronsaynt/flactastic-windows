@@ -20,12 +20,9 @@ has a test in `crates/fl-sync` or `crates/fl-core`.
 | Pairing: commitment, length-prefixed transcript, HKDF infos, role MACs | `PairingCrypto.swift` | `fl_sync::crypto` | `crypto::tests`, `pairing::tests` |
 | `deviceKind` in `Hello`/`PairConfirm` is a closed enum on the Mac: sending anything but `mac/iPhone/iPad/other` makes the Mac reject the message | `SyncDeviceKind` | Desktop sends `other` everywhere | — |
 | TXT `k` unknown → `other` on decode (safe), `v` must be `major.minor` digits | `TXTRecordCodec.swift` | `fl_sync::txt` | `round_trip_and_unknown_kind` |
-
 | `tagFingerprint`: NFC + trimmed fields in a fixed order joined by U+001F, secondary genres sorted, `mix` appended only when true | `ContentHasher.swift` (`TagFingerprint`) | `fl_sync::manifest::tag_fingerprint` | `fingerprint_matches_the_mac_golden_value` (the Mac's pinned digest) |
-| `planHash`: direction, then `n:`/`c:`/`p:`/`q:` groups, each sorted, joined by `
-`, SHA-256 hex | `Manifest.swift` (`SyncPlan.planHash`) | `SyncPlan::plan_hash` | `plan_hash_and_restriction` |
-| Playlist hash: `name
-` + `trackID-or-"-"\|relativePath` lines (entry UUIDs excluded) | `ManifestBuilder.contentHash(for:)` | `manifest::playlist_content_hash` | `playlist_hash_uses_name_and_ordered_entries` |
+| `planHash`: direction, then `n:`/`c:`/`p:`/`q:` groups, each sorted, joined by `\n`, SHA-256 hex | `Manifest.swift` (`SyncPlan.planHash`) | `SyncPlan::plan_hash` | `plan_hash_and_restriction` |
+| Playlist hash: `name\n` + `trackID-or-"-"` `\|` `relativePath` lines (entry UUIDs excluded) | `ManifestBuilder.contentHash(for:)` | `manifest::playlist_content_hash` | `playlist_hash_uses_name_and_ordered_entries` |
 | `sync-hashes.json` sidecar: `{relPath: {contentHash, fileSize, mtime}}`, `mtime` as seconds since 2001, valid within 1 ms | `ContentHashCache.swift` | `fl_sync::builder::ContentHashCache` | `cache_validity_and_sidecar_format` |
 | Incoming files land in `.flactastic/incoming/<ID>.part`; the `.part` length is the resume offset | `FileTransfer.swift` | `fl_sync::transfer` | `an_interrupted_transfer_resumes_from_the_part_file` |
 
