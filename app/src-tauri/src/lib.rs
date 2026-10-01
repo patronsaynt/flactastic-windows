@@ -9,6 +9,7 @@ pub mod home;
 pub mod import;
 pub mod lucida;
 pub mod lyrics;
+pub mod media_controls;
 pub mod organizer;
 pub mod visualizer;
 pub mod metadata;
@@ -75,6 +76,7 @@ pub fn run() {
             }
             auth.restore();
             presence::spawn(app.handle().clone());
+            media_controls::spawn(app.handle().clone());
             // The hidden Lucida window must not keep the app alive.
             if let Some(main) = app.get_webview_window("main") {
                 let handle = app.handle().clone();
