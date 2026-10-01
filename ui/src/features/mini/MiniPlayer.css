@@ -1,0 +1,135 @@
+/* MenuBarPlayerView */
+
+html:has(.mini),
+html:has(.mini) body {
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.mini {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 320px;
+  padding: var(--space-lg);
+  background: var(--surface);
+  user-select: none;
+}
+
+.mini__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.mini__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mini__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mini__artist,
+.mini__album {
+  overflow: hidden;
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mini__artist {
+  color: var(--text-secondary);
+}
+
+.mini__album {
+  color: var(--text-tertiary);
+}
+
+.mini__transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+}
+
+.mini__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--text-primary);
+}
+
+.mini__btn.is-play {
+  width: 46px;
+  height: 46px;
+}
+
+.mini__btn:active {
+  transform: scale(0.94);
+}
+
+.mini__empty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.mini__empty-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  color: color-mix(in srgb, var(--text-tertiary) 60%, transparent);
+  background: var(--surface-elevated);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.mini__empty-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.mini__empty-sub {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.mini__divider {
+  height: 1px;
+  background: var(--divider);
+}
+
+.mini__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.mini__link {
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+.mini__link.is-quit {
+  color: var(--text-tertiary);
+}
+
+.mini__link:hover {
+  text-decoration: underline;
+}

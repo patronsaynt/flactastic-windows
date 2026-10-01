@@ -19,6 +19,7 @@ pub mod presence;
 pub mod rebuild;
 pub mod spotify_auth;
 pub mod state;
+pub mod tray;
 
 use std::sync::Arc;
 
@@ -77,6 +78,7 @@ pub fn run() {
             auth.restore();
             presence::spawn(app.handle().clone());
             media_controls::spawn(app.handle().clone());
+            tray::setup(app.handle())?;
             // The hidden Lucida window must not keep the app alive.
             if let Some(main) = app.get_webview_window("main") {
                 let handle = app.handle().clone();
@@ -187,6 +189,9 @@ pub fn run() {
             spotify_auth::spotify_disconnect,
             spotify_auth::spotify_load_playlists,
             spotify_auth::spotify_resolve_playlist,
+            tray::mini_open_main,
+            tray::mini_quit,
+            tray::debug_toggle_mini,
         ])
         .build(tauri::generate_context!())
         .expect("error while building FLACtastic")

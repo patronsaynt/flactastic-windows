@@ -72,6 +72,7 @@ impl AppState {
         let callbacks = Callbacks {
             state: Box::new(move |snap| {
                 crate::media_controls::publish(&snap);
+                crate::tray::on_player_state(&a1, snap.is_playing);
                 let _ = a1.emit("player://state", snap);
             }),
             plays: Box::new(move |plays| {

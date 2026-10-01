@@ -59,6 +59,9 @@ pub fn set_setting(app: AppHandle, st: St, key: String, value: Value) -> Result<
     if key == "flactastic.countedPlayFraction" {
         st.player.send(Cmd::SetCountedPlayFraction(updated.counted_play_fraction));
     }
+    if key == "flactastic.showMenuBarPlayer" {
+        crate::tray::refresh(&app);
+    }
     let v = serde_json::to_value(&updated).unwrap_or(Value::Null);
     let _ = app.emit("settings://changed", v.clone());
     Ok(v)
