@@ -6,12 +6,14 @@
 pub mod builder;
 pub mod connection;
 pub mod crypto;
+pub mod discovery;
 pub mod exchange;
 pub mod frame;
 pub mod fs_space;
 pub mod gatekeeper;
 pub mod manifest;
 pub mod pairing;
+pub mod picklist;
 pub mod path_sanitizer;
 pub mod protocol;
 pub mod session;

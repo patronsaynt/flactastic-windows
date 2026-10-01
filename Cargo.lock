@@ -1600,6 +1600,7 @@ dependencies = [
  "hmac",
  "libc",
  "log",
+ "mdns-sd",
  "openssl",
  "openssl-sys",
  "serde",
