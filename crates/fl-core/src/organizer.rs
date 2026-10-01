@@ -476,10 +476,12 @@ pub fn directory_contains_audio(dir: &Path) -> bool {
     false
 }
 
-/// Old → new relative paths for `TrackIdStore::rename_paths`.
+/// Old → new relative paths for `TrackIdStore::rename_paths`. Conflicted
+/// operations are moved too (with a numeric suffix), so they're re-keyed as
+/// well; the Mac only re-keys `.move` (MAC-ISSUES #11).
 pub fn relative_path_map(ops: &[Operation], result: &ExecResult, root: &Path) -> HashMap<String, String> {
     let by_id: HashMap<Uid, &Operation> =
-        ops.iter().filter(|o| o.status == OpStatus::Move).map(|o| (o.track.id, o)).collect();
+        ops.iter().filter(|o| o.status != OpStatus::Unchanged).map(|o| (o.track.id, o)).collect();
     let mut map = HashMap::new();
     for (id, new_path) in &result.moved {
         let Some(op) = by_id.get(id) else { continue };
@@ -611,8 +613,20 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let a = track(dir.path(), "a.flac", "X", "Y", 1, "Same");
         let b = track(dir.path(), "b.flac", "X", "Y", 1, "Same");
-        let ops = plan(&[a, b], &OrganizerProfile::default_profile(), dir.path());
+        let ops = plan(&[a.clone(), b.clone()], &OrganizerProfile::default_profile(), dir.path());
         assert!(ops.iter().all(|o| matches!(o.status, OpStatus::Conflict(_))));
+
+        // Both are moved (the second gets a suffix) and both are re-keyed.
+        for t in [&a, &b] {
+            std::fs::write(&t.path, b"x").unwrap();
+        }
+        let res = execute(&ops, dir.path(), false, |_, _, _| {});
+        assert_eq!(res.moved.len(), 2);
+        let map = relative_path_map(&ops, &res, dir.path());
+        assert_eq!(map.len(), 2);
+        let mut news: Vec<&String> = map.values().collect();
+        news.sort();
+        assert_ne!(news[0], news[1]);
     }
 
     #[test]
