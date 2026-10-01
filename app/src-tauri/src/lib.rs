@@ -14,6 +14,7 @@ pub mod visualizer;
 pub mod metadata;
 pub mod player_actor;
 pub mod playlists;
+pub mod presence;
 pub mod rebuild;
 pub mod spotify_auth;
 pub mod state;
@@ -73,6 +74,7 @@ pub fn run() {
                 });
             }
             auth.restore();
+            presence::spawn(app.handle().clone());
             // The hidden Lucida window must not keep the app alive.
             if let Some(main) = app.get_webview_window("main") {
                 let handle = app.handle().clone();

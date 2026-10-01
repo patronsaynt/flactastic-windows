@@ -2,6 +2,7 @@
 //! them on worker threads.
 
 pub mod deezer;
+pub mod discord;
 pub mod lrclib;
 pub mod lucida;
 pub mod odesli;
