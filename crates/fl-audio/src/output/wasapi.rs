@@ -572,13 +572,19 @@ mod tests {
         let b = WasapiBackend::new();
         let calls = Arc::new(AtomicUsize::new(0));
         let c2 = calls.clone();
-        let s = b
-            .open(&StreamSpec::default(), Box::new(move |buf, _ch| {
-                buf.fill(0.0);
-                c2.fetch_add(1, Ordering::Relaxed);
-                0
-            }))
-            .expect("open shared stream");
+        let s = match b.open(&StreamSpec::default(), Box::new(move |buf, _ch| {
+            buf.fill(0.0);
+            c2.fetch_add(1, Ordering::Relaxed);
+            0
+        })) {
+            Ok(s) => s,
+            // CI runners have no audio hardware; nothing to test there.
+            Err(e) if e == "no output device" => {
+                eprintln!("skipping: no output device");
+                return;
+            }
+            Err(e) => panic!("open shared stream: {e:?}"),
+        };
         eprintln!("shared format: {:?}", s.format());
         std::thread::sleep(std::time::Duration::from_millis(500));
         assert!(s.error().is_none(), "{:?}", s.error());
