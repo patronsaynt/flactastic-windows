@@ -489,11 +489,13 @@ impl Engine {
     /// Restart decode from the current track's continuation point, appending
     /// to its open entry (the `reorderQueue` seamless path).
     fn continue_current_track(&mut self) {
+        // Cancel first: the decode thread keeps scheduling audio until it is
+        // joined, so the continuation point is only stable afterwards.
+        self.cancel_decode();
         let end = self.decode.live_schedule_end.load(Ordering::Acquire);
         let entry_start = self.timeline.lock().entries.last().map(|e| e.start).unwrap_or(0);
         let pre = (end - entry_start) as f64 / self.out_rate();
         let offset = self.seek_time_offset + pre;
-        self.cancel_decode();
         let appending = {
             let mut tl = self.timeline.lock();
             tl.next_schedule_frame = end;
