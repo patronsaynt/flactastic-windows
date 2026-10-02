@@ -13,7 +13,7 @@ import { LucidaDebugPanel } from "./features/download/LucidaDebug";
 import { SyncWindowHost } from "./features/sync/SyncWindow";
 import { ConfirmHost } from "./components/sheet/ConfirmDialog";
 import { EditorHost } from "./features/editors/EditorHost";
-import { OnboardingView } from "./features/onboarding/OnboardingView";
+import { OnboardingPreviewHost, OnboardingView } from "./features/onboarding/OnboardingView";
 import { VisualizerView } from "./features/visualizer/VisualizerView";
 import { OrganizerView } from "./features/organizer/OrganizerView";
 import { PlaylistsTabView } from "./features/playlists/PlaylistsTabView";
@@ -161,6 +161,7 @@ export function App() {
       <LucidaChallengeHost />
       <LucidaDebugPanel />
       <SyncWindowHost />
+      <OnboardingPreviewHost />
       <ConfirmHost />
       <ContextMenuHost />
     </div>

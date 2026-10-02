@@ -49,16 +49,68 @@
       "icons/icon.ico"
     ],
     "shortDescription": "A music player for your FLAC library",
+    "publisher": "FLACtastic",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico"
+      }
+    },
+    "linux": {
+      "deb": {
+        "depends": [
+          "libasound2",
+          "libdbus-1-3"
+        ],
+        "desktopTemplate": "linux/flactastic.desktop"
+      },
+      "rpm": {
+        "depends": [
+          "alsa-lib",
+          "dbus-libs"
+        ],
+        "desktopTemplate": "linux/flactastic.desktop"
+      }
+    },
     "fileAssociations": [
       {
         "ext": [
-          "flac",
-          "mp3",
-          "m4a",
-          "wav",
+          "flac"
+        ],
+        "mimeType": "audio/flac",
+        "name": "Audio File",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "mp3"
+        ],
+        "mimeType": "audio/mpeg",
+        "name": "Audio File",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "m4a"
+        ],
+        "mimeType": "audio/mp4",
+        "name": "Audio File",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "wav"
+        ],
+        "mimeType": "audio/wav",
+        "name": "Audio File",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
           "aiff",
           "aif"
         ],
+        "mimeType": "audio/aiff",
         "name": "Audio File",
         "role": "Viewer"
       }

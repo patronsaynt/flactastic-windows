@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
-import { Check, CheckCircle2, ChevronLeft, FolderPlus, ListMusic } from "lucide-react";
+import { Check, CheckCircle2, ChevronLeft, FolderPlus, ListMusic, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { create } from "zustand";
 import { setSetting, useSetting, useSettingsStore } from "../../app/settings";
 import { useDownloads } from "../../app/downloads";
 import { api } from "../../lib/api";
@@ -9,6 +10,7 @@ import { RiseFadeIn } from "../../components/RiseFadeIn";
 import { PillButton } from "../../components/settings/Primitives";
 import { WindowControls } from "../../components/shell/WindowControls";
 import { alertDialog } from "../../components/sheet/ConfirmDialog";
+import { Modal } from "../../components/sheet/Sheet";
 import { chooseLibraryFolder } from "../home/HomeView";
 import "./Onboarding.css";
 
@@ -17,9 +19,11 @@ type Step = (typeof STEPS)[number];
 
 /**
  * `OnboardingView`: welcome, appearance, library folder, optional Spotify,
- * then a summary. Replaces the whole window until finished.
+ * then a summary. Replaces the whole window until finished. With `onFinish`
+ * (the Debug Onboarding preview) finishing calls it instead of marking
+ * onboarding complete.
  */
-export function OnboardingView() {
+export function OnboardingView({ onFinish }: { onFinish?: () => void } = {}) {
   const [step, setStep] = useState<Step>("welcome");
   const [dir, setDir] = useState(1);
   const i = STEPS.indexOf(step);
@@ -31,13 +35,21 @@ export function OnboardingView() {
     setDir(-1);
     setStep(STEPS[Math.max(i - 1, 0)]);
   };
-  const finish = () => setSetting("flactastic.hasCompletedOnboarding", true);
+  const finish = onFinish ?? (() => setSetting("flactastic.hasCompletedOnboarding", true));
 
   return (
-    <div className="onboarding">
-      <div className="onboarding__titlebar" data-tauri-drag-region>
-        <WindowControls />
-      </div>
+    <div className={"onboarding" + (onFinish ? " is-preview" : "")}>
+      {onFinish ? (
+        <div className="onboarding__titlebar">
+          <button className="onboarding__close" onClick={onFinish} title="Close">
+            <X size={15} strokeWidth={2} />
+          </button>
+        </div>
+      ) : (
+        <div className="onboarding__titlebar" data-tauri-drag-region>
+          <WindowControls />
+        </div>
+      )}
       <div className="onboarding__stage">
         <div className="onboarding-card">
           {step !== "welcome" && (
@@ -264,6 +276,25 @@ function SpotifyPage({ onNext }: { onNext: () => void }) {
         )}
       </RiseFadeIn>
     </Page>
+  );
+}
+
+/** Whether the Debug Onboarding preview (`OnboardingDebugPreviewView`) is open. */
+const useOnboardingPreview = create<{ open: boolean }>(() => ({ open: false }));
+export const openOnboardingPreview = () => useOnboardingPreview.setState({ open: true });
+
+/**
+ * `OnboardingDebugPreviewView`: the real onboarding sequence, 640 × 720, over
+ * the app (the Mac opens it as its own window), against the live settings
+ * and library. Opened from Settings → Debug → Debug Onboarding.
+ */
+export function OnboardingPreviewHost() {
+  const open = useOnboardingPreview((s) => s.open);
+  const close = () => useOnboardingPreview.setState({ open: false });
+  return (
+    <Modal open={open} onClose={close}>
+      {open && <OnboardingView onFinish={close} />}
+    </Modal>
   );
 }
 

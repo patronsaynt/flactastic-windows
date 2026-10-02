@@ -1,0 +1,116 @@
+name: Release
+
+# The Mac's release.yml for Windows and Linux: a tag like v1.3.0-beta.2 (or a
+# manual run) writes version.txt and builds the installers with the same
+# scripts used locally. Idle until the repository is hosted.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build (e.g. 1.3.0-beta.2 or beta-7)"
+        required: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+            artifact: FLACtastic-Windows
+          - name: Linux
+            # The oldest supported runner, so the AppImage and .deb run on
+            # older glibc too.
+            os: ubuntu-22.04
+            artifact: FLACtastic-Linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync version.txt with tag
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          echo "${GITHUB_REF#refs/tags/v}" > version.txt
+          cat version.txt
+
+      - name: Sync version.txt from manual input
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          echo "${{ github.event.inputs.version }}" > version.txt
+          cat version.txt
+
+      - name: Linux build packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
+            librsvg2-dev libasound2-dev libdbus-1-dev libssl-dev patchelf file rpm cmake nasm
+
+      - name: NASM (vendored OpenSSL)
+        if: runner.os == 'Windows'
+        uses: ilammy/setup-nasm@v1
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+          cache-dependency-path: ui/pnpm-lock.yaml
+
+      - name: Tauri CLI
+        run: cargo install tauri-cli --version "^2" --locked
+
+      - name: Build release (Windows)
+        if: runner.os == 'Windows'
+        run: powershell -ExecutionPolicy Bypass -File scripts/build-release.ps1 -SkipTests
+
+      - name: Build release (Linux)
+        if: runner.os == 'Linux'
+        run: bash scripts/linux/build-release.sh --skip-tests
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/*
+
+  publish:
+    name: Publish GitHub Release
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Combine release notes
+        run: |
+          {
+            echo "## Windows"; cat artifacts/FLACtastic-Windows/RELEASE_NOTES.md | tail -n +2
+            echo; echo "## Linux"; cat artifacts/FLACtastic-Linux/RELEASE_NOTES.md | tail -n +2
+          } > RELEASE_NOTES.md
+          rm artifacts/*/RELEASE_NOTES.md
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*/*
+          body_path: RELEASE_NOTES.md
+          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') || contains(github.ref, '-rc') }}

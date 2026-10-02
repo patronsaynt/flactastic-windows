@@ -117,17 +117,24 @@ export class PickState {
   }
 }
 
-/** `ByteCountFormatter` (`.file`: decimal units). */
+/**
+ * `ByteCountFormatter` (`.file`, adaptive): decimal units; KB whole, MB one
+ * decimal, GB and up two, trailing zeros dropped; "Zero KB", "1 byte".
+ */
 export function byteCount(n: number): string {
+  if (n === 0) return "Zero KB";
+  if (n === 1) return "1 byte";
   if (n < 1000) return `${n} bytes`;
-  const units = ["KB", "MB", "GB", "TB"];
+  const units = ["KB", "MB", "GB", "TB", "PB"];
+  const decimals = [0, 1, 2, 2, 2];
   let v = n / 1000;
   let i = 0;
-  while (v >= 1000 && i < units.length - 1) {
+  // Step up while the rounded value would print as 1000 of this unit.
+  while (i < units.length - 1 && Number(v.toFixed(decimals[i])) >= 1000) {
     v /= 1000;
     i++;
   }
-  return `${v < 10 ? v.toFixed(1) : Math.round(v)} ${units[i]}`;
+  return `${Number(v.toFixed(decimals[i])).toLocaleString("en-US", { maximumFractionDigits: decimals[i] })} ${units[i]}`;
 }
 
 /** `SyncPeerStore.lastSyncedDescription`. */

@@ -22,6 +22,7 @@ import {
   type PickerOption,
 } from "../../components/settings/Primitives";
 import { chooseLibraryFolder } from "../home/HomeView";
+import { openOnboardingPreview } from "../onboarding/OnboardingView";
 import wordmark from "../../assets/Wordmark.png";
 import "./SettingsView.css";
 
@@ -443,7 +444,7 @@ function DebugPane() {
             label="Debug Onboarding"
             subtitle="Replay the first-run onboarding sequence in its own window, against the app's live settings and library."
           />
-          <PillButton onClick={() => {}}>Preview</PillButton>
+          <PillButton onClick={openOnboardingPreview}>Preview</PillButton>
         </div>
       </SettingsGroup>
     </div>

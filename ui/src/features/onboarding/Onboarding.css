@@ -6,6 +6,23 @@
   background: var(--background);
 }
 
+/* Debug Onboarding preview: the Mac's 640 × 720 window, as a sheet. */
+.onboarding.is-preview {
+  position: relative;
+  inset: auto;
+  width: 640px;
+  max-width: 100%;
+  height: min(720px, calc(100vh - 80px));
+}
+
+.onboarding__close {
+  display: flex;
+  margin: 12px 14px 0 0;
+  padding: 4px;
+  align-self: flex-start;
+  color: var(--text-tertiary);
+}
+
 .onboarding__titlebar {
   height: 40px;
   flex: none;
